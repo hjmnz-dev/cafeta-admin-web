@@ -18,11 +18,32 @@ export const router = createBrowserRouter([
     path: '/',
     Component: AdminLayout,
     children: [
-      { index: true, element: guarded('el dashboard administrativo', <DashboardScreen />) },
-      { path: 'usuarios', element: guarded('el listado de usuarios', <UsersScreen />) },
-      { path: 'reportes', element: guarded('los reportes de la comunidad', <ReportsReviewScreen />) },
-      { path: 'bitacora', element: guarded('la bitácora de auditoría', <AuditLogScreen />) },
-      { path: 'informes', element: guarded('los informes administrativos', <AdminReportsScreen />) },
+      {
+        index: true,
+        element: guarded('el dashboard administrativo', <DashboardScreen />),
+      },
+      {
+        path: 'usuarios',
+        element: guarded('el listado de usuarios', <UsersScreen />),
+      },
+      {
+        path: 'reportes',
+        element: guarded(
+          'los reportes de la comunidad',
+          <ReportsReviewScreen />,
+        ),
+      },
+      {
+        path: 'bitacora',
+        element: guarded('la bitácora de auditoría', <AuditLogScreen />),
+      },
+      {
+        path: 'informes',
+        element: guarded(
+          'los informes administrativos',
+          <AdminReportsScreen />,
+        ),
+      },
     ],
   },
 ]);

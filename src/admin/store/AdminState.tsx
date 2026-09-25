@@ -136,7 +136,14 @@ interface AdminStateValue {
   logReportGenerated: (detail: string) => void;
 }
 
-const CAREERS = ['Ing. Software', 'Ing. Industrial', 'Ing. Civil', 'Medicina', 'Adm. Empresas', 'Psicología'];
+const CAREERS = [
+  'Ing. Software',
+  'Ing. Industrial',
+  'Ing. Civil',
+  'Medicina',
+  'Adm. Empresas',
+  'Psicología',
+];
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -154,47 +161,205 @@ const DEFAULT_SESSION: Session = {
  */
 const sampleUsers = (): AdminUser[] => {
   const now = Date.now();
-  const seed: [string, string, string, number, AccountStatus, VerificationStatus, number, number][] = [
-    ['maria', 'María Rodríguez', 'mrodriguez@est.intec.edu.do', 0, 'active', 'verified', 27, 842],
-    ['juan', 'Juan Pérez', 'jperez@est.intec.edu.do', 1, 'active', 'verified', 40, 512],
-    ['laura', 'Laura Batista', 'lbatista@est.intec.edu.do', 2, 'active', 'pending', 63, 1204],
-    ['pedro', 'Pedro Sánchez', 'psanchez@est.intec.edu.do', 3, 'active', 'pending', 15, 231],
-    ['ana', 'Ana Martínez', 'amartinez@est.intec.edu.do', 4, 'inactive', 'verified', 8, 96],
-    ['roberto', 'Roberto Díaz', 'rdiaz@est.intec.edu.do', 5, 'active', 'rejected', 3, 44],
-    ['comite', 'Comité de Estudiantes', 'comite@intec.edu.do', 0, 'active', 'verified', 120, 3100],
-    ['carlos', 'Carlos Gómez', 'cgomez@est.intec.edu.do', 2, 'active', 'verified', 12, 318],
+  const seed: [
+    string,
+    string,
+    string,
+    number,
+    AccountStatus,
+    VerificationStatus,
+    number,
+    number,
+  ][] = [
+    [
+      'maria',
+      'María Rodríguez',
+      'mrodriguez@est.intec.edu.do',
+      0,
+      'active',
+      'verified',
+      27,
+      842,
+    ],
+    [
+      'juan',
+      'Juan Pérez',
+      'jperez@est.intec.edu.do',
+      1,
+      'active',
+      'verified',
+      40,
+      512,
+    ],
+    [
+      'laura',
+      'Laura Batista',
+      'lbatista@est.intec.edu.do',
+      2,
+      'active',
+      'pending',
+      63,
+      1204,
+    ],
+    [
+      'pedro',
+      'Pedro Sánchez',
+      'psanchez@est.intec.edu.do',
+      3,
+      'active',
+      'pending',
+      15,
+      231,
+    ],
+    [
+      'ana',
+      'Ana Martínez',
+      'amartinez@est.intec.edu.do',
+      4,
+      'inactive',
+      'verified',
+      8,
+      96,
+    ],
+    [
+      'roberto',
+      'Roberto Díaz',
+      'rdiaz@est.intec.edu.do',
+      5,
+      'active',
+      'rejected',
+      3,
+      44,
+    ],
+    [
+      'comite',
+      'Comité de Estudiantes',
+      'comite@intec.edu.do',
+      0,
+      'active',
+      'verified',
+      120,
+      3100,
+    ],
+    [
+      'carlos',
+      'Carlos Gómez',
+      'cgomez@est.intec.edu.do',
+      2,
+      'active',
+      'verified',
+      12,
+      318,
+    ],
   ];
-  return seed.map(([id, name, email, careerIdx, status, verification, posts, followers], i) => ({
-    id,
-    name,
-    email,
-    career: CAREERS[careerIdx],
-    joinedAt: now - (30 - i * 3) * DAY,
-    status,
-    verification,
-    posts,
-    followers,
-  }));
+  return seed.map(
+    (
+      [id, name, email, careerIdx, status, verification, posts, followers],
+      i,
+    ) => ({
+      id,
+      name,
+      email,
+      career: CAREERS[careerIdx],
+      joinedAt: now - (30 - i * 3) * DAY,
+      status,
+      verification,
+      posts,
+      followers,
+    }),
+  );
 };
 
 const samplePosts = (): AdminPost[] => {
   const now = Date.now();
   return [
-    { id: 'p2', authorId: 'juan', authorName: 'Juan Pérez', content: 'Resumen de Cálculo Diferencial para el parcial de mañana.', createdAt: now - 2 * DAY, active: true },
-    { id: 'p3', authorId: 'maria', authorName: 'María Rodríguez', content: 'Libro de Anatomía Humana en PDF para quien lo necesite.', createdAt: now - 4 * DAY, active: true },
-    { id: 'p7', authorId: 'roberto', authorName: 'Roberto Díaz', content: 'Vendo respuestas del examen final, escríbanme por privado.', createdAt: now - 1 * DAY, active: true },
-    { id: 'p8', authorId: 'ana', authorName: 'Ana Martínez', content: 'Mensaje ofensivo contra un grupo de estudiantes.', createdAt: now - 3 * DAY, active: true },
+    {
+      id: 'p2',
+      authorId: 'juan',
+      authorName: 'Juan Pérez',
+      content: 'Resumen de Cálculo Diferencial para el parcial de mañana.',
+      createdAt: now - 2 * DAY,
+      active: true,
+    },
+    {
+      id: 'p3',
+      authorId: 'maria',
+      authorName: 'María Rodríguez',
+      content: 'Libro de Anatomía Humana en PDF para quien lo necesite.',
+      createdAt: now - 4 * DAY,
+      active: true,
+    },
+    {
+      id: 'p7',
+      authorId: 'roberto',
+      authorName: 'Roberto Díaz',
+      content: 'Vendo respuestas del examen final, escríbanme por privado.',
+      createdAt: now - 1 * DAY,
+      active: true,
+    },
+    {
+      id: 'p8',
+      authorId: 'ana',
+      authorName: 'Ana Martínez',
+      content: 'Mensaje ofensivo contra un grupo de estudiantes.',
+      createdAt: now - 3 * DAY,
+      active: true,
+    },
   ];
 };
 
 const sampleReports = (): AdminReport[] => {
   const now = Date.now();
   return [
-    { id: 'r1', targetType: 'post', targetId: 'p7', reason: 'Spam o publicidad', reportedBy: 'María Rodríguez', createdAt: now - 20 * 60 * 60 * 1000, status: 'pending' },
-    { id: 'r2', targetType: 'post', targetId: 'p8', reason: 'Acoso o intimidación', reportedBy: 'Juan Pérez', createdAt: now - 2 * DAY, status: 'pending' },
-    { id: 'r3', targetType: 'user', targetId: 'roberto', reason: 'Suplantación de identidad', reportedBy: 'Laura Batista', createdAt: now - 3 * DAY, status: 'pending' },
-    { id: 'r4', targetType: 'user', targetId: 'ana', reason: 'Acoso o intimidación', reportedBy: 'Pedro Sánchez', createdAt: now - 6 * DAY, status: 'sanctioned', resolvedBy: 'Hamsell Jiménez', resolvedAt: now - 5 * DAY },
-    { id: 'r5', targetType: 'post', targetId: 'p2', reason: 'Contenido inapropiado', reportedBy: 'Ana Martínez', createdAt: now - 8 * DAY, status: 'dismissed', resolvedBy: 'Hamsell Jiménez', resolvedAt: now - 7 * DAY },
+    {
+      id: 'r1',
+      targetType: 'post',
+      targetId: 'p7',
+      reason: 'Spam o publicidad',
+      reportedBy: 'María Rodríguez',
+      createdAt: now - 20 * 60 * 60 * 1000,
+      status: 'pending',
+    },
+    {
+      id: 'r2',
+      targetType: 'post',
+      targetId: 'p8',
+      reason: 'Acoso o intimidación',
+      reportedBy: 'Juan Pérez',
+      createdAt: now - 2 * DAY,
+      status: 'pending',
+    },
+    {
+      id: 'r3',
+      targetType: 'user',
+      targetId: 'roberto',
+      reason: 'Suplantación de identidad',
+      reportedBy: 'Laura Batista',
+      createdAt: now - 3 * DAY,
+      status: 'pending',
+    },
+    {
+      id: 'r4',
+      targetType: 'user',
+      targetId: 'ana',
+      reason: 'Acoso o intimidación',
+      reportedBy: 'Pedro Sánchez',
+      createdAt: now - 6 * DAY,
+      status: 'sanctioned',
+      resolvedBy: 'Hamsell Jiménez',
+      resolvedAt: now - 5 * DAY,
+    },
+    {
+      id: 'r5',
+      targetType: 'post',
+      targetId: 'p2',
+      reason: 'Contenido inapropiado',
+      reportedBy: 'Ana Martínez',
+      createdAt: now - 8 * DAY,
+      status: 'dismissed',
+      resolvedBy: 'Hamsell Jiménez',
+      resolvedAt: now - 7 * DAY,
+    },
   ];
 };
 
@@ -203,19 +368,34 @@ const sampleAudit = (): AuditEntry[] => {
   const now = Date.now();
   return [
     {
-      id: 'a1', at: now - 5 * DAY, actor: 'Hamsell Jiménez', actorRole: 'admin',
-      action: 'report.sanction', target: 'Ana Martínez',
-      detail: 'Reporte por acoso o intimidación resuelto con sanción.', succeeded: true,
+      id: 'a1',
+      at: now - 5 * DAY,
+      actor: 'Hamsell Jiménez',
+      actorRole: 'admin',
+      action: 'report.sanction',
+      target: 'Ana Martínez',
+      detail: 'Reporte por acoso o intimidación resuelto con sanción.',
+      succeeded: true,
     },
     {
-      id: 'a2', at: now - 5 * DAY + 60_000, actor: 'Hamsell Jiménez', actorRole: 'admin',
-      action: 'account.deactivate', target: 'Ana Martínez',
-      detail: 'Cuenta desactivada tras la revisión del reporte.', succeeded: true,
+      id: 'a2',
+      at: now - 5 * DAY + 60_000,
+      actor: 'Hamsell Jiménez',
+      actorRole: 'admin',
+      action: 'account.deactivate',
+      target: 'Ana Martínez',
+      detail: 'Cuenta desactivada tras la revisión del reporte.',
+      succeeded: true,
     },
     {
-      id: 'a3', at: now - 7 * DAY, actor: 'Hamsell Jiménez', actorRole: 'admin',
-      action: 'report.dismiss', target: 'Publicación p2',
-      detail: 'Reporte desestimado: el contenido no infringe las normas.', succeeded: true,
+      id: 'a3',
+      at: now - 7 * DAY,
+      actor: 'Hamsell Jiménez',
+      actorRole: 'admin',
+      action: 'report.dismiss',
+      target: 'Publicación p2',
+      detail: 'Reporte desestimado: el contenido no infringe las normas.',
+      succeeded: true,
     },
   ];
 };
@@ -239,7 +419,9 @@ function load(): PersistedState {
         session: { ...DEFAULT_SESSION, ...parsed.session },
         users: Array.isArray(parsed.users) ? parsed.users : sampleUsers(),
         posts: Array.isArray(parsed.posts) ? parsed.posts : samplePosts(),
-        reports: Array.isArray(parsed.reports) ? parsed.reports : sampleReports(),
+        reports: Array.isArray(parsed.reports)
+          ? parsed.reports
+          : sampleReports(),
         audit: Array.isArray(parsed.audit) ? parsed.audit : sampleAudit(),
       };
     }
@@ -260,12 +442,19 @@ const nextAuditId = () => `audit-${Date.now()}-${++auditSeq}`;
 
 const AdminStateContext = createContext<AdminStateValue | null>(null);
 
-export function AdminStateProvider({ children }: { children: React.ReactNode }) {
+export function AdminStateProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [{ session, users, posts, reports, audit }, setState] = useState(load);
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ session, users, posts, reports, audit }));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ session, users, posts, reports, audit }),
+      );
     } catch {
       /* almacenamiento no disponible: el estado sigue solo en memoria */
     }
@@ -279,7 +468,11 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
       session:
         role === 'admin'
           ? DEFAULT_SESSION
-          : { role: 'student', name: 'Carlos Gómez', email: 'cgomez@est.intec.edu.do' },
+          : {
+              role: 'student',
+              name: 'Carlos Gómez',
+              email: 'cgomez@est.intec.edu.do',
+            },
     }));
 
   /** Añade una entrada a la bitácora. Toda acción pasa por aquí (HU46). */
@@ -307,7 +500,13 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
   });
 
   /** Estado actual como una sola pieza, para decidir y registrar sobre él. */
-  const snapshot = (): PersistedState => ({ session, users, posts, reports, audit });
+  const snapshot = (): PersistedState => ({
+    session,
+    users,
+    posts,
+    reports,
+    audit,
+  });
 
   /**
    * Ejecuta una acción administrativa con una sola regla: sin permisos no se
@@ -319,11 +518,21 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
   const adminAction = (
     action: AuditAction,
     target: string,
-    run: (s: PersistedState) => { state: PersistedState; detail: string } | { error: string },
+    run: (
+      s: PersistedState,
+    ) => { state: PersistedState; detail: string } | { error: string },
   ): boolean => {
     const s = snapshot();
     if (s.session.role !== 'admin') {
-      setState(record(s, 'access.denied', target, `Intento de "${AUDIT_ACTION_LABELS[action]}" sin permisos administrativos.`, false));
+      setState(
+        record(
+          s,
+          'access.denied',
+          target,
+          `Intento de "${AUDIT_ACTION_LABELS[action]}" sin permisos administrativos.`,
+          false,
+        ),
+      );
       return false;
     }
     const result = run(s);
@@ -335,9 +544,14 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
     return true;
   };
 
-  const findUser = (s: PersistedState, id: string) => s.users.find((u) => u.id === id);
+  const findUser = (s: PersistedState, id: string) =>
+    s.users.find((u) => u.id === id);
 
-  const setUser = (s: PersistedState, id: string, patch: Partial<AdminUser>): PersistedState => ({
+  const setUser = (
+    s: PersistedState,
+    id: string,
+    patch: Partial<AdminUser>,
+  ): PersistedState => ({
     ...s,
     users: s.users.map((u) => (u.id === id ? { ...u, ...patch } : u)),
   });
@@ -346,7 +560,8 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
     adminAction('account.deactivate', id, (s) => {
       const user = findUser(s, id);
       if (!user) return { error: 'La cuenta no existe.' };
-      if (user.status === 'inactive') return { error: `La cuenta de ${user.name} ya estaba inactiva.` };
+      if (user.status === 'inactive')
+        return { error: `La cuenta de ${user.name} ya estaba inactiva.` };
       return {
         state: setUser(s, id, { status: 'inactive' }),
         detail: `Cuenta de ${user.name} desactivada: se restringe su acceso y se conserva su registro.`,
@@ -358,7 +573,8 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
       const user = findUser(s, id);
       if (!user) return { error: 'La cuenta no existe.' };
       // HU49, escenario 2: reactivar algo ya activo no es un cambio, es un aviso.
-      if (user.status === 'active') return { error: `La cuenta de ${user.name} ya se encuentra activa.` };
+      if (user.status === 'active')
+        return { error: `La cuenta de ${user.name} ya se encuentra activa.` };
       return {
         state: setUser(s, id, { status: 'active' }),
         detail: `Cuenta de ${user.name} reactivada: se restaura su acceso.`,
@@ -369,7 +585,8 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
     adminAction('account.verify', id, (s) => {
       const user = findUser(s, id);
       if (!user) return { error: 'La cuenta no existe.' };
-      if (user.verification === 'verified') return { error: `La cuenta de ${user.name} ya estaba verificada.` };
+      if (user.verification === 'verified')
+        return { error: `La cuenta de ${user.name} ya estaba verificada.` };
       return {
         state: setUser(s, id, { verification: 'verified' }),
         detail: `Cuenta de ${user.name} verificada como miembro de la universidad.`,
@@ -390,9 +607,15 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
     adminAction('post.deactivate', id, (s) => {
       const post = s.posts.find((p) => p.id === id);
       if (!post) return { error: 'La publicación no existe.' };
-      if (!post.active) return { error: 'La publicación ya estaba desactivada.' };
+      if (!post.active)
+        return { error: 'La publicación ya estaba desactivada.' };
       return {
-        state: { ...s, posts: s.posts.map((p) => (p.id === id ? { ...p, active: false } : p)) },
+        state: {
+          ...s,
+          posts: s.posts.map((p) =>
+            p.id === id ? { ...p, active: false } : p,
+          ),
+        },
         detail: `Publicación de ${post.authorName} desactivada por infringir las normas.`,
       };
     });
@@ -400,7 +623,7 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
   /** Nombre legible del objetivo de una denuncia, para la bitácora. */
   const targetName = (s: PersistedState, report: AdminReport) =>
     report.targetType === 'user'
-      ? findUser(s, report.targetId)?.name ?? report.targetId
+      ? (findUser(s, report.targetId)?.name ?? report.targetId)
       : `Publicación ${report.targetId}`;
 
   const resolveReport = (
@@ -425,7 +648,8 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
     adminAction('report.sanction', reportId, (s) => {
       const report = s.reports.find((r) => r.id === reportId);
       if (!report) return { error: 'El reporte no existe.' };
-      if (report.status !== 'pending') return { error: 'El reporte ya estaba resuelto.' };
+      if (report.status !== 'pending')
+        return { error: 'El reporte ya estaba resuelto.' };
 
       const name = targetName(s, report);
       const resolved = resolveReport(s, reportId, 'sanctioned');
@@ -439,7 +663,9 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
       return {
         state: {
           ...resolved,
-          posts: resolved.posts.map((p) => (p.id === report.targetId ? { ...p, active: false } : p)),
+          posts: resolved.posts.map((p) =>
+            p.id === report.targetId ? { ...p, active: false } : p,
+          ),
         },
         detail: `Reporte contra ${name} (${report.reason}) resuelto con sanción: publicación desactivada.`,
       };
@@ -449,7 +675,8 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
     adminAction('report.dismiss', reportId, (s) => {
       const report = s.reports.find((r) => r.id === reportId);
       if (!report) return { error: 'El reporte no existe.' };
-      if (report.status !== 'pending') return { error: 'El reporte ya estaba resuelto.' };
+      if (report.status !== 'pending')
+        return { error: 'El reporte ya estaba resuelto.' };
       return {
         state: resolveReport(s, reportId, 'dismissed'),
         detail: `Reporte contra ${targetName(s, report)} desestimado: se cierra sin aplicar restricciones.`,
@@ -457,19 +684,40 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
     });
 
   const logAccessDenied = (target: string) =>
-    setState(record(snapshot(), 'access.denied', target, 'Intento de acceso a una sección administrativa sin permisos.', false));
+    setState(
+      record(
+        snapshot(),
+        'access.denied',
+        target,
+        'Intento de acceso a una sección administrativa sin permisos.',
+        false,
+      ),
+    );
 
   const logReportGenerated = (detail: string) =>
-    setState(record(snapshot(), 'report.generate', 'Reportes administrativos', detail));
+    setState(
+      record(snapshot(), 'report.generate', 'Reportes administrativos', detail),
+    );
 
   return (
     <AdminStateContext.Provider
       value={{
-        session, signIn, isAdmin,
-        users, posts, reports, audit,
-        deactivateAccount, reactivateAccount, verifyAccount, rejectVerification,
-        deactivatePost, sanctionReport, dismissReport,
-        logAccessDenied, logReportGenerated,
+        session,
+        signIn,
+        isAdmin,
+        users,
+        posts,
+        reports,
+        audit,
+        deactivateAccount,
+        reactivateAccount,
+        verifyAccount,
+        rejectVerification,
+        deactivatePost,
+        sanctionReport,
+        dismissReport,
+        logAccessDenied,
+        logReportGenerated,
       }}
     >
       {children}
@@ -479,6 +727,7 @@ export function AdminStateProvider({ children }: { children: React.ReactNode }) 
 
 export function useAdminState(): AdminStateValue {
   const ctx = useContext(AdminStateContext);
-  if (!ctx) throw new Error('useAdminState debe usarse dentro de <AdminStateProvider>');
+  if (!ctx)
+    throw new Error('useAdminState debe usarse dentro de <AdminStateProvider>');
   return ctx;
 }

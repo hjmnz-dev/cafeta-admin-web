@@ -30,7 +30,12 @@ function StatusPill({ user }: { user: AdminUser }) {
         (active ? 'bg-[#e8f3ec] text-[#2f7d4f]' : 'bg-[#f1ece9] text-[#8a807c]')
       }
     >
-      <span className={'w-1.5 h-1.5 rounded-full ' + (active ? 'bg-[#2f7d4f]' : 'bg-[#8a807c]')} />
+      <span
+        className={
+          'w-1.5 h-1.5 rounded-full ' +
+          (active ? 'bg-[#2f7d4f]' : 'bg-[#8a807c]')
+        }
+      />
       {active ? 'Activa' : 'Inactiva'}
     </span>
   );
@@ -43,38 +48,66 @@ function VerificationPill({ user }: { user: AdminUser }) {
     rejected: { label: 'Rechazada', className: 'bg-[#f1ece9] text-[#8a807c]' },
   }[user.verification];
 
-  return <span className={`inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold ${map.className}`}>{map.label}</span>;
+  return (
+    <span
+      className={`inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold ${map.className}`}
+    >
+      {map.label}
+    </span>
+  );
 }
 
 export function UsersScreen() {
-  const { users, deactivateAccount, reactivateAccount, verifyAccount, rejectVerification } = useAdminState();
+  const {
+    users,
+    deactivateAccount,
+    reactivateAccount,
+    verifyAccount,
+    rejectVerification,
+  } = useAdminState();
 
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<StatusFilter>('all');
-  const [notice, setNotice] = useState<{ tone: 'ok' | 'warn'; text: string } | null>(null);
-  const [confirming, setConfirming] = useState<{ user: AdminUser; kind: 'deactivate' | 'reactivate' } | null>(null);
+  const [notice, setNotice] = useState<{
+    tone: 'ok' | 'warn';
+    text: string;
+  } | null>(null);
+  const [confirming, setConfirming] = useState<{
+    user: AdminUser;
+    kind: 'deactivate' | 'reactivate';
+  } | null>(null);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     return users.filter((u) => {
-      const matchesQuery = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+      const matchesQuery =
+        !q ||
+        u.name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q);
       const matchesFilter =
         filter === 'all' ||
-        (filter === 'pending' ? u.verification === 'pending' : u.status === filter);
+        (filter === 'pending'
+          ? u.verification === 'pending'
+          : u.status === filter);
       return matchesQuery && matchesFilter;
     });
   }, [users, query, filter]);
 
   /** Ejecuta la acción y traduce su resultado a un aviso en pantalla. */
   const run = (ok: boolean, okText: string, failText: string) =>
-    setNotice(ok ? { tone: 'ok', text: okText } : { tone: 'warn', text: failText });
+    setNotice(
+      ok ? { tone: 'ok', text: okText } : { tone: 'warn', text: failText },
+    );
 
   return (
     <section className="max-w-[1180px]">
       <header className="mb-5">
-        <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">Usuarios</h1>
+        <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
+          Usuarios
+        </h1>
         <p className="text-[14px] text-[#8a807c]">
-          {users.length} cuentas registradas · gestión de estado y verificación institucional.
+          {users.length} cuentas registradas · gestión de estado y verificación
+          institucional.
         </p>
       </header>
 
@@ -95,7 +128,10 @@ export function UsersScreen() {
       {/* Búsqueda dentro del listado (HU47, escenario 2) */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[260px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#8a807c]" aria-hidden />
+          <Search
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#8a807c]"
+            aria-hidden
+          />
           <input
             type="search"
             aria-label="Buscar por nombre o correo"
@@ -127,36 +163,62 @@ export function UsersScreen() {
       <div className="bg-white border border-[#e3ddd9] rounded-[18px] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-[14px]">
-            <caption className="sr-only">Cuentas registradas en la plataforma</caption>
+            <caption className="sr-only">
+              Cuentas registradas en la plataforma
+            </caption>
             <thead>
               <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#8a807c]">
-                <th scope="col" className="px-4 py-3 font-semibold">Cuenta</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Carrera</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Alta</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Estado</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Verificación</th>
-                <th scope="col" className="px-4 py-3 font-semibold text-right">Acciones</th>
+                <th scope="col" className="px-4 py-3 font-semibold">
+                  Cuenta
+                </th>
+                <th scope="col" className="px-4 py-3 font-semibold">
+                  Carrera
+                </th>
+                <th scope="col" className="px-4 py-3 font-semibold">
+                  Alta
+                </th>
+                <th scope="col" className="px-4 py-3 font-semibold">
+                  Estado
+                </th>
+                <th scope="col" className="px-4 py-3 font-semibold">
+                  Verificación
+                </th>
+                <th scope="col" className="px-4 py-3 font-semibold text-right">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody>
               {results.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-[#8a807c]">
+                  <td
+                    colSpan={6}
+                    className="px-4 py-10 text-center text-[#8a807c]"
+                  >
                     Ninguna cuenta coincide con la búsqueda.
                   </td>
                 </tr>
               )}
 
               {results.map((u) => (
-                <tr key={u.id} className="border-t border-[#f0ebe8] align-middle">
+                <tr
+                  key={u.id}
+                  className="border-t border-[#f0ebe8] align-middle"
+                >
                   <td className="px-4 py-3">
                     <p className="font-semibold text-[#171313]">{u.name}</p>
                     <p className="text-[13px] text-[#8a807c]">{u.email}</p>
                   </td>
                   <td className="px-4 py-3 text-[#4a4340]">{u.career}</td>
-                  <td className="px-4 py-3 text-[#4a4340] whitespace-nowrap">{formatDate(u.joinedAt)}</td>
-                  <td className="px-4 py-3"><StatusPill user={u} /></td>
-                  <td className="px-4 py-3"><VerificationPill user={u} /></td>
+                  <td className="px-4 py-3 text-[#4a4340] whitespace-nowrap">
+                    {formatDate(u.joinedAt)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <StatusPill user={u} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <VerificationPill user={u} />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2 flex-wrap">
                       {u.verification !== 'verified' && (
@@ -171,7 +233,8 @@ export function UsersScreen() {
                           aria-label={`Verificar cuenta de ${u.name}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors"
                         >
-                          <BadgeCheck className="w-4 h-4" aria-hidden /> Verificar
+                          <BadgeCheck className="w-4 h-4" aria-hidden />{' '}
+                          Verificar
                         </button>
                       )}
                       {u.verification === 'pending' && (
@@ -191,7 +254,9 @@ export function UsersScreen() {
                       )}
                       {u.status === 'active' ? (
                         <button
-                          onClick={() => setConfirming({ user: u, kind: 'deactivate' })}
+                          onClick={() =>
+                            setConfirming({ user: u, kind: 'deactivate' })
+                          }
                           aria-label={`Desactivar cuenta de ${u.name}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold bg-[#d62828] text-white hover:bg-[#7e1418] transition-colors"
                         >
@@ -199,11 +264,14 @@ export function UsersScreen() {
                         </button>
                       ) : (
                         <button
-                          onClick={() => setConfirming({ user: u, kind: 'reactivate' })}
+                          onClick={() =>
+                            setConfirming({ user: u, kind: 'reactivate' })
+                          }
                           aria-label={`Reactivar cuenta de ${u.name}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border-2 border-[#d62828] text-[#d62828] hover:bg-[#ffe9e6] transition-colors"
                         >
-                          <UserCheck className="w-4 h-4" aria-hidden /> Reactivar
+                          <UserCheck className="w-4 h-4" aria-hidden />{' '}
+                          Reactivar
                         </button>
                       )}
                     </div>
@@ -217,10 +285,16 @@ export function UsersScreen() {
 
       {/* Confirmación: una sanción sobre una cuenta no se aplica de un clic */}
       {confirming && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6" role="dialog" aria-modal="true">
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6"
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="bg-white w-full max-w-[420px] p-6 rounded-[20px] shadow-2xl">
             <h2 className="font-['Space_Grotesk',sans-serif] font-bold text-[18px] mb-2">
-              {confirming.kind === 'deactivate' ? 'Desactivar cuenta' : 'Reactivar cuenta'}
+              {confirming.kind === 'deactivate'
+                ? 'Desactivar cuenta'
+                : 'Reactivar cuenta'}
             </h2>
             <p className="text-[14px] text-[#8a807c] leading-relaxed mb-5">
               {confirming.kind === 'deactivate'
@@ -254,7 +328,9 @@ export function UsersScreen() {
                 }}
                 className="px-4 py-2.5 rounded-full text-[14px] font-semibold text-white bg-[#d62828] hover:bg-[#7e1418] transition-colors"
               >
-                {confirming.kind === 'deactivate' ? 'Desactivar cuenta' : 'Reactivar cuenta'}
+                {confirming.kind === 'deactivate'
+                  ? 'Desactivar cuenta'
+                  : 'Reactivar cuenta'}
               </button>
             </div>
           </div>

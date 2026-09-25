@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { Download, FileBarChart } from 'lucide-react';
 import { useAdminState } from '../store/AdminState';
-import { buildReport, toCsv, REPORT_KINDS, ReportKind, GeneratedReport } from '../lib/metrics';
+import {
+  buildReport,
+  toCsv,
+  REPORT_KINDS,
+  ReportKind,
+  GeneratedReport,
+} from '../lib/metrics';
 import { formatDate, toDateInput, startOfDay, endOfDay } from '../lib/format';
 
 /**
@@ -45,7 +51,9 @@ export function AdminReportsScreen() {
   const download = () => {
     if (!result) return;
     // Descarga en el navegador: sin servidor, el archivo se arma en memoria.
-    const blob = new Blob([`﻿${toCsv(result)}`], { type: 'text/csv;charset=utf-8' });
+    const blob = new Blob([`﻿${toCsv(result)}`], {
+      type: 'text/csv;charset=utf-8',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -56,14 +64,18 @@ export function AdminReportsScreen() {
     URL.revokeObjectURL(url);
   };
 
-  const field = 'rounded-[12px] border border-[#e3ddd9] bg-white px-3 py-2 text-[14px] outline-none focus:border-[#d62828]';
+  const field =
+    'rounded-[12px] border border-[#e3ddd9] bg-white px-3 py-2 text-[14px] outline-none focus:border-[#d62828]';
 
   return (
     <section className="max-w-[1180px]">
       <header className="mb-5">
-        <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">Informes administrativos</h1>
+        <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
+          Informes administrativos
+        </h1>
         <p className="text-[14px] text-[#8a807c]">
-          Información estructurada y exportable para sustentar decisiones. Cada generación queda en la bitácora.
+          Información estructurada y exportable para sustentar decisiones. Cada
+          generación queda en la bitácora.
         </p>
       </header>
 
@@ -72,19 +84,38 @@ export function AdminReportsScreen() {
         <div className="flex flex-wrap items-end gap-4">
           <label className="flex flex-col gap-1 text-[12px] text-[#8a807c] min-w-[240px]">
             Tipo de informe
-            <select aria-label="Tipo de informe" value={kind} onChange={(e) => setKind(e.target.value as ReportKind)} className={field}>
+            <select
+              aria-label="Tipo de informe"
+              value={kind}
+              onChange={(e) => setKind(e.target.value as ReportKind)}
+              className={field}
+            >
               {REPORT_KINDS.map((k) => (
-                <option key={k.value} value={k.value}>{k.label}</option>
+                <option key={k.value} value={k.value}>
+                  {k.label}
+                </option>
               ))}
             </select>
           </label>
           <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
             Desde
-            <input type="date" aria-label="Desde" value={from} onChange={(e) => setFrom(e.target.value)} className={field} />
+            <input
+              type="date"
+              aria-label="Desde"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className={field}
+            />
           </label>
           <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
             Hasta
-            <input type="date" aria-label="Hasta" value={to} onChange={(e) => setTo(e.target.value)} className={field} />
+            <input
+              type="date"
+              aria-label="Hasta"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className={field}
+            />
           </label>
           <button
             onClick={generate}
@@ -93,8 +124,14 @@ export function AdminReportsScreen() {
             Generar informe
           </button>
         </div>
-        <p className="text-[13px] text-[#8a807c] mt-3">{REPORT_KINDS.find((k) => k.value === kind)!.description}</p>
-        {error && <p role="alert" className="mt-3 text-[14px] text-[#d62828]">{error}</p>}
+        <p className="text-[13px] text-[#8a807c] mt-3">
+          {REPORT_KINDS.find((k) => k.value === kind)!.description}
+        </p>
+        {error && (
+          <p role="alert" className="mt-3 text-[14px] text-[#d62828]">
+            {error}
+          </p>
+        )}
       </div>
 
       {/* Resultado */}
@@ -102,9 +139,12 @@ export function AdminReportsScreen() {
         <div className="bg-white border border-[#e3ddd9] rounded-[18px] overflow-hidden">
           <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-[#f0ebe8]">
             <div>
-              <h2 className="font-['Space_Grotesk',sans-serif] font-bold text-[17px]">{result.title}</h2>
+              <h2 className="font-['Space_Grotesk',sans-serif] font-bold text-[17px]">
+                {result.title}
+              </h2>
               <p className="text-[13px] text-[#8a807c]">
-                Del {formatDate(result.from)} al {formatDate(result.to)} · {result.rows.length}{' '}
+                Del {formatDate(result.from)} al {formatDate(result.to)} ·{' '}
+                {result.rows.length}{' '}
                 {result.rows.length === 1 ? 'registro' : 'registros'}
               </p>
             </div>
@@ -119,10 +159,16 @@ export function AdminReportsScreen() {
 
           {result.rows.length === 0 ? (
             <div className="px-5 py-12 text-center">
-              <FileBarChart className="w-8 h-8 text-[#8a807c] mx-auto mb-2" aria-hidden />
-              <p className="text-[15px] font-semibold text-[#4a4340]">No hay datos disponibles para este rango</p>
+              <FileBarChart
+                className="w-8 h-8 text-[#8a807c] mx-auto mb-2"
+                aria-hidden
+              />
+              <p className="text-[15px] font-semibold text-[#4a4340]">
+                No hay datos disponibles para este rango
+              </p>
               <p className="text-[13px] text-[#8a807c] mt-1">
-                No se registró actividad de este tipo entre las fechas seleccionadas. Prueba con un rango más amplio.
+                No se registró actividad de este tipo entre las fechas
+                seleccionadas. Prueba con un rango más amplio.
               </p>
             </div>
           ) : (
@@ -132,7 +178,13 @@ export function AdminReportsScreen() {
                 <thead>
                   <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#8a807c]">
                     {result.columns.map((c) => (
-                      <th key={c} scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">{c}</th>
+                      <th
+                        key={c}
+                        scope="col"
+                        className="px-4 py-3 font-semibold whitespace-nowrap"
+                      >
+                        {c}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -140,7 +192,9 @@ export function AdminReportsScreen() {
                   {result.rows.map((row, i) => (
                     <tr key={i} className="border-t border-[#f0ebe8]">
                       {row.map((cell, j) => (
-                        <td key={j} className="px-4 py-3 text-[#4a4340]">{cell}</td>
+                        <td key={j} className="px-4 py-3 text-[#4a4340]">
+                          {cell}
+                        </td>
                       ))}
                     </tr>
                   ))}
