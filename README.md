@@ -4,16 +4,16 @@ Aplicación web de escritorio para **FT10 – Administración y auditoría**, el
 
 ## Historias cubiertas
 
-| HU | Qué hace | Dónde |
-|---|---|---|
-| HU43 | Dashboard con indicadores de uso y actividad | `components/DashboardScreen.tsx` |
-| HU44 | Informes administrativos con rango de fechas y descarga CSV | `components/AdminReportsScreen.tsx` |
-| HU45 | Bitácora de auditoría con filtros por responsable, acción y fechas | `components/AuditLogScreen.tsx` |
-| HU46 | Registro automático de cada acción relevante, incluidos los intentos rechazados | `store/AdminState.tsx` |
-| HU47 | Listado de cuentas con búsqueda por nombre o correo | `components/UsersScreen.tsx` |
-| HU48 · HU49 | Desactivar y reactivar cuentas, con confirmación | `components/UsersScreen.tsx` |
-| HU50 | Verificar o rechazar la verificación institucional | `components/UsersScreen.tsx` |
-| HU51 · HU52 | Revisar denuncias de usuarios y publicaciones: sancionar o desestimar | `components/ReportsReviewScreen.tsx` |
+| HU          | Qué hace                                                                        | Dónde                                |
+| ----------- | ------------------------------------------------------------------------------- | ------------------------------------ |
+| HU43        | Dashboard con indicadores de uso y actividad                                    | `components/DashboardScreen.tsx`     |
+| HU44        | Informes administrativos con rango de fechas y descarga CSV                     | `components/AdminReportsScreen.tsx`  |
+| HU45        | Bitácora de auditoría con filtros por responsable, acción y fechas              | `components/AuditLogScreen.tsx`      |
+| HU46        | Registro automático de cada acción relevante, incluidos los intentos rechazados | `store/AdminState.tsx`               |
+| HU47        | Listado de cuentas con búsqueda por nombre o correo                             | `components/UsersScreen.tsx`         |
+| HU48 · HU49 | Desactivar y reactivar cuentas, con confirmación                                | `components/UsersScreen.tsx`         |
+| HU50        | Verificar o rechazar la verificación institucional                              | `components/UsersScreen.tsx`         |
+| HU51 · HU52 | Revisar denuncias de usuarios y publicaciones: sancionar o desestimar           | `components/ReportsReviewScreen.tsx` |
 
 El control de acceso (HU43/HU48, escenario 2) vive en `components/RequireAdmin.tsx`: sin permisos no se muestra la sección y el intento queda en la bitácora.
 

@@ -13,7 +13,10 @@ export function LocationProbe() {
  * Renderiza una pantalla dentro de los providers reales (AdminStateProvider +
  * MemoryRouter), en una ruta comodín para que siga montada aunque navegue.
  */
-export function renderWithProviders(ui: ReactElement, { route = '/' }: { route?: string } = {}) {
+export function renderWithProviders(
+  ui: ReactElement,
+  { route = '/' }: { route?: string } = {},
+) {
   return render(
     <AdminStateProvider>
       <MemoryRouter initialEntries={[route]}>

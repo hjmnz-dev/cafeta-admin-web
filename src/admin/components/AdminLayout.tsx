@@ -1,5 +1,13 @@
 import { NavLink, Outlet } from 'react-router';
-import { LayoutDashboard, Users, Flag, ScrollText, FileBarChart, ShieldCheck, UserCog } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  Flag,
+  ScrollText,
+  FileBarChart,
+  ShieldCheck,
+  UserCog,
+} from 'lucide-react';
 import { useAdminState } from '../store/AdminState';
 
 /**
@@ -12,9 +20,24 @@ import { useAdminState } from '../store/AdminState';
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/usuarios', label: 'Usuarios', icon: Users, end: false },
-  { to: '/reportes', label: 'Reportes de la comunidad', icon: Flag, end: false },
-  { to: '/bitacora', label: 'Bitácora de auditoría', icon: ScrollText, end: false },
-  { to: '/informes', label: 'Informes administrativos', icon: FileBarChart, end: false },
+  {
+    to: '/reportes',
+    label: 'Reportes de la comunidad',
+    icon: Flag,
+    end: false,
+  },
+  {
+    to: '/bitacora',
+    label: 'Bitácora de auditoría',
+    icon: ScrollText,
+    end: false,
+  },
+  {
+    to: '/informes',
+    label: 'Informes administrativos',
+    icon: FileBarChart,
+    end: false,
+  },
 ];
 
 /** Selector de sesión: sin login real, permite comprobar los permisos. */
@@ -24,7 +47,9 @@ function SessionSwitch() {
   return (
     <div className="flex items-center gap-3">
       <div className="text-right leading-tight hidden sm:block">
-        <p className="text-[13px] font-semibold text-[#171313]">{session.name}</p>
+        <p className="text-[13px] font-semibold text-[#171313]">
+          {session.name}
+        </p>
         <p className="text-[12px] text-[#8a807c]">{session.email}</p>
       </div>
       <label className="flex items-center gap-2 text-[13px] text-[#4a4340]">
@@ -54,10 +79,16 @@ export function AdminLayout() {
       <aside className="w-[248px] flex-none bg-white border-r border-[#e3ddd9] flex flex-col">
         <div className="px-5 py-5 border-b border-[#e3ddd9]">
           <div className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-[10px] bg-[#d62828] text-white flex items-center justify-center font-bold">c</span>
+            <span className="w-8 h-8 rounded-[10px] bg-[#d62828] text-white flex items-center justify-center font-bold">
+              c
+            </span>
             <div className="leading-tight">
-              <p className="font-['Space_Grotesk',sans-serif] font-bold text-[17px] lowercase tracking-[-0.03em]">cafeta</p>
-              <p className="text-[11px] text-[#8a807c] uppercase tracking-[0.14em] font-['IBM_Plex_Mono',monospace]">Consola admin</p>
+              <p className="font-['Space_Grotesk',sans-serif] font-bold text-[17px] lowercase tracking-[-0.03em]">
+                cafeta
+              </p>
+              <p className="text-[11px] text-[#8a807c] uppercase tracking-[0.14em] font-['IBM_Plex_Mono',monospace]">
+                Consola admin
+              </p>
             </div>
           </div>
         </div>
@@ -70,7 +101,9 @@ export function AdminLayout() {
               end={end}
               className={({ isActive }) =>
                 'flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] transition-colors ' +
-                (isActive ? 'bg-[#ffe9e6] text-[#d62828] font-semibold' : 'text-[#4a4340] hover:bg-[#fbf8f7]')
+                (isActive
+                  ? 'bg-[#ffe9e6] text-[#d62828] font-semibold'
+                  : 'text-[#4a4340] hover:bg-[#fbf8f7]')
               }
             >
               <Icon className="w-[18px] h-[18px] flex-none" aria-hidden />
@@ -89,14 +122,19 @@ export function AdminLayout() {
 
         <div className="p-4 border-t border-[#e3ddd9] flex items-start gap-2 text-[11px] text-[#8a807c] leading-snug">
           <ShieldCheck className="w-4 h-4 flex-none mt-0.5" aria-hidden />
-          <p>Toda acción ejecutada aquí queda registrada en la bitácora de auditoría.</p>
+          <p>
+            Toda acción ejecutada aquí queda registrada en la bitácora de
+            auditoría.
+          </p>
         </div>
       </aside>
 
       {/* Contenido */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-[64px] flex-none bg-white border-b border-[#e3ddd9] flex items-center justify-between px-6">
-          <p className="text-[13px] text-[#8a807c]">Administración y auditoría · FT10</p>
+          <p className="text-[13px] text-[#8a807c]">
+            Administración y auditoría · FT10
+          </p>
           <SessionSwitch />
         </header>
 
