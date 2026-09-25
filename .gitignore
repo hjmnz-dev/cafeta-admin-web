@@ -1,0 +1,17 @@
+node_modules
+dist
+coverage
+*.local
+
+# Variables de entorno (nunca se suben)
+.env
+.env.*
+!.env.example
+
+# Registros, editor y sistema
+*.log
+*.tsbuildinfo
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
