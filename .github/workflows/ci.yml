@@ -1,5 +1,5 @@
 # Revisión en cada push y PR: lint, formato, tipos, build y pruebas.
-# En main, si todo pasa, publica dist/ en Static Web Apps (spec 0006).
+# En main, si todo pasa, sube dist/ y deploy/server.mjs a su Web App de App Service (spec 0006).
 name: CI
 
 on:
@@ -35,6 +35,7 @@ jobs:
     timeout-minutes: 10
     environment: production
     permissions:
+      id-token: write
       contents: read
     concurrency:
       group: deploy-production
@@ -47,12 +48,21 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - uses: Azure/static-web-apps-deploy@v1
+      # En el paquete, server.mjs queda en la raíz junto a dist/ (startup: node server.mjs).
+      - name: Empaquetar
+        run: |
+          mkdir package
+          cp -r dist package/dist
+          cp deploy/server.mjs package/server.mjs
+          (cd package && zip -qr ../app.zip .)
+      - uses: azure/login@v2
         with:
-          action: upload
-          app_location: dist
-          skip_app_build: true
-          skip_api_build: true
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          package: app.zip
       - name: Prueba de humo
-        run: curl --fail --silent --show-error --output /dev/null --retry 10 --retry-delay 6 --retry-all-errors "${{ vars.PUBLIC_URL }}"
+        run: curl --fail --silent --show-error --output /dev/null --retry 30 --retry-delay 10 --retry-all-errors "${{ vars.PUBLIC_URL }}"
