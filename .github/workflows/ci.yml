@@ -47,7 +47,15 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run build
+      # El monitoreo (spec 0007) queda fijo en el build; sin él, no se publica.
+      # El build sube los source maps a Sentry y los borra.
+      - run: test -n "$VITE_SENTRY_DSN" && test -n "$SENTRY_AUTH_TOKEN" && npm run build
+        env:
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+          VITE_APP_VERSION: ${{ github.sha }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
       # En el paquete, server.mjs queda en la raíz junto a dist/ (startup: node server.mjs).
       - name: Empaquetar
         run: |
@@ -56,6 +64,8 @@ jobs:
           # version.txt lleva el commit; la prueba de humo espera verlo publicado.
           printf '%s' "$GITHUB_SHA" > package/dist/version.txt
           cp deploy/server.mjs package/server.mjs
+          # Ningún source map se publica (spec 0007).
+          ! find package -name '*.map' | grep -q .
           (cd package && zip -qr ../app.zip .)
       - uses: azure/login@v2
         with:
