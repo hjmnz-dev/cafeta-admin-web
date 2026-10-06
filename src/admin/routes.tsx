@@ -7,6 +7,10 @@ import { UsersScreen } from './components/UsersScreen';
 import { ReportsReviewScreen } from './components/ReportsReviewScreen';
 import { AuditLogScreen } from './components/AuditLogScreen';
 import { AdminReportsScreen } from './components/AdminReportsScreen';
+import {
+  RootErrorBoundary,
+  ThrowOnRender,
+} from './components/RootErrorBoundary';
 
 /** Toda sección administrativa pasa por el control de acceso (HU43/HU48). */
 const guarded = (section: string, element: ReactNode) => (
@@ -17,7 +21,11 @@ export const router = createBrowserRouter([
   {
     path: '/',
     Component: AdminLayout,
+    // Pantalla de error en español, también para rutas que no existen (spec 0007).
+    ErrorBoundary: RootErrorBoundary,
     children: [
+      // Ruta oculta para probar el monitoreo (spec 0007), fuera de RequireAdmin.
+      { path: '__prueba-error', Component: ThrowOnRender },
       {
         index: true,
         element: guarded('el dashboard administrativo', <DashboardScreen />),
