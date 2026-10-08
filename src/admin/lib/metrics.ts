@@ -1,89 +1,14 @@
-import type {
-  AdminPost,
-  AdminReport,
-  AdminUser,
-  AuditEntry,
-} from '../store/AdminState';
+import type { AdminReport, AdminUser, AuditEntry } from '../store/AdminState';
 import { AUDIT_ACTION_LABELS } from '../store/AdminState';
 import { formatDate, formatDateTime } from './format';
 
 /**
- * Cálculo de indicadores y armado de reportes (HU43/HU44).
+ * Armado de informes (HU44).
  *
  * Vive aparte de las pantallas por dos motivos: se puede probar sin montar la
  * interfaz, y el día que exista backend estas funciones son exactamente lo que
  * se sustituye por consultas al servidor.
  */
-
-const DAY = 24 * 60 * 60 * 1000;
-
-export interface UsageIndicators {
-  totalUsers: number;
-  activeUsers: number;
-  inactiveUsers: number;
-  pendingVerification: number;
-  pendingReports: number;
-  activePosts: number;
-  newUsers7d: number;
-}
-
-/** Indicadores generales del dashboard (HU43). */
-export function usageIndicators(
-  users: AdminUser[],
-  posts: AdminPost[],
-  reports: AdminReport[],
-  now: number = Date.now(),
-): UsageIndicators {
-  return {
-    totalUsers: users.length,
-    activeUsers: users.filter((u) => u.status === 'active').length,
-    inactiveUsers: users.filter((u) => u.status === 'inactive').length,
-    pendingVerification: users.filter((u) => u.verification === 'pending')
-      .length,
-    pendingReports: reports.filter((r) => r.status === 'pending').length,
-    activePosts: posts.filter((p) => p.active).length,
-    newUsers7d: users.filter((u) => now - u.joinedAt <= 7 * DAY).length,
-  };
-}
-
-export interface DayCount {
-  /** Inicio del día, en epoch ms. */
-  day: number;
-  count: number;
-}
-
-/**
- * Altas de cuentas por día para los últimos `days` días, incluido hoy. Devuelve
- * un punto por día aunque no haya altas: un hueco en la serie se leería como
- * "no hay dato" en vez de "no hubo altas".
- */
-export function signupsByDay(
-  users: AdminUser[],
-  days = 14,
-  now: number = Date.now(),
-): DayCount[] {
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-
-  return Array.from({ length: days }, (_, i) => {
-    const day = start.getTime() - (days - 1 - i) * DAY;
-    const count = users.filter(
-      (u) => u.joinedAt >= day && u.joinedAt < day + DAY,
-    ).length;
-    return { day, count };
-  });
-}
-
-/** Distribución de cuentas por carrera, de mayor a menor. */
-export function usersByCareer(
-  users: AdminUser[],
-): { career: string; count: number }[] {
-  const counts = new Map<string, number>();
-  for (const u of users) counts.set(u.career, (counts.get(u.career) ?? 0) + 1);
-  return [...counts.entries()]
-    .map(([career, count]) => ({ career, count }))
-    .sort((a, b) => b.count - a.count || a.career.localeCompare(b.career));
-}
 
 export type ReportKind = 'signups' | 'reports' | 'moderation';
 

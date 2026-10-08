@@ -6,9 +6,10 @@ import {
   ScrollText,
   FileBarChart,
   ShieldCheck,
-  UserCog,
+  LogOut,
 } from 'lucide-react';
 import { useAdminState } from '../store/AdminState';
+import { useSession } from '../store/SessionStore';
 
 /**
  * Armazón de la consola: navegación lateral fija y lienzo ancho.
@@ -40,31 +41,27 @@ const NAV = [
   },
 ];
 
-/** Selector de sesión: sin login real, permite comprobar los permisos. */
-function SessionSwitch() {
-  const { session, signIn } = useAdminState();
+/** Quien tiene la sesión abierta y la salida. */
+function SessionBadge() {
+  const { user, logout } = useSession();
+  if (!user) return null;
 
   return (
     <div className="flex items-center gap-3">
       <div className="text-right leading-tight hidden sm:block">
         <p className="text-[13px] font-semibold text-[#171313]">
-          {session.name}
+          {user.profile.displayName}
         </p>
-        <p className="text-[12px] text-[#8a807c]">{session.email}</p>
+        <p className="text-[12px] text-[#8a807c]">{user.email}</p>
       </div>
-      <label className="flex items-center gap-2 text-[13px] text-[#4a4340]">
-        <span className="sr-only">Rol de la sesión</span>
-        <UserCog className="w-4 h-4 text-[#8a807c]" aria-hidden />
-        <select
-          aria-label="Rol de la sesión"
-          value={session.role}
-          onChange={(e) => signIn(e.target.value as 'admin' | 'student')}
-          className="rounded-full border border-[#e3ddd9] bg-white px-3 py-1.5 text-[13px] outline-none focus:border-[#d62828]"
-        >
-          <option value="admin">Administrador</option>
-          <option value="student">Estudiante</option>
-        </select>
-      </label>
+      <button
+        type="button"
+        onClick={() => void logout()}
+        className="flex items-center gap-2 rounded-full border border-[#e3ddd9] bg-white px-3 py-1.5 text-[13px] text-[#4a4340] hover:border-[#d62828]"
+      >
+        <LogOut className="w-4 h-4 text-[#8a807c]" aria-hidden />
+        Cerrar sesión
+      </button>
     </div>
   );
 }
@@ -135,7 +132,7 @@ export function AdminLayout() {
           <p className="text-[13px] text-[#8a807c]">
             Administración y auditoría · FT10
           </p>
-          <SessionSwitch />
+          <SessionBadge />
         </header>
 
         <main className="flex-1 min-w-0 p-6">

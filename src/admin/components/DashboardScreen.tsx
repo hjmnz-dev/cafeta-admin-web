@@ -1,28 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router';
-import {
-  Users,
-  UserCheck,
-  UserX,
-  BadgeCheck,
-  Flag,
-  FileText,
-} from 'lucide-react';
-import { useAdminState } from '../store/AdminState';
-import { usageIndicators, signupsByDay, usersByCareer } from '../lib/metrics';
-import { formatDate } from '../lib/format';
+import { BadgeCheck, CircleDashed, FileText, Flag, Users } from 'lucide-react';
+import { userMessageOf } from '../lib/http';
+import { useDashboardMetrics } from '../store/dashboard-queries';
 
 /**
  * HU43 — Dashboard administrativo.
  *
- * Da la foto inmediata: primero las cifras que obligan a actuar (reportes
- * pendientes, verificaciones en cola), después las dos series que explican el
- * movimiento de la plataforma. Los gráficos son de una sola serie, así que el
- * color no codifica identidad: basta el rojo de marca sobre fondo blanco, y el
- * texto conserva sus propios tonos. La consola se define en claro, como la app.
+ * Da la foto inmediata con cifras reales: la API las cuenta al momento, sin
+ * caché. Primero van las que obligan a actuar (reportes pendientes, cuentas por
+ * verificar), después el volumen de la plataforma. Cada cifra con trabajo
+ * detrás lleva al lugar donde se atiende.
  */
-
-const DAYS = 14;
 
 function StatTile({
   icon: Icon,
@@ -75,139 +64,13 @@ function StatTile({
   );
 }
 
-/** Altas por día: una serie, barras finas con extremo redondeado y hueco de 2px. */
-function SignupsChart({ data }: { data: { day: number; count: number }[] }) {
-  const width = 560;
-  const height = 150;
-  const padBottom = 22;
-  const max = Math.max(1, ...data.map((d) => d.count));
-  const slot = width / data.length;
-  const barWidth = slot - 6; // el hueco separa las barras sin adelgazarlas
-
-  return (
-    <figure className="m-0">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="w-full h-auto"
-        role="img"
-        aria-label={`Altas de cuentas por día en los últimos ${data.length} días. Máximo ${max} en un día.`}
-      >
-        {/* Línea base recesiva */}
-        <line
-          x1="0"
-          y1={height - padBottom}
-          x2={width}
-          y2={height - padBottom}
-          stroke="#e3ddd9"
-          strokeWidth="1"
-        />
-
-        {data.map((d, i) => {
-          const plot = height - padBottom;
-          const h =
-            d.count === 0 ? 0 : Math.max(6, (d.count / max) * (plot - 18));
-          const x = i * slot + 3;
-          return (
-            <g key={d.day}>
-              {d.count > 0 && (
-                <>
-                  <rect
-                    x={x}
-                    y={plot - h}
-                    width={barWidth}
-                    height={h}
-                    rx="4"
-                    fill="#d62828"
-                  />
-                  {/* Etiqueta directa solo donde hay dato: no un número por barra vacía */}
-                  <text
-                    x={x + barWidth / 2}
-                    y={plot - h - 6}
-                    textAnchor="middle"
-                    fontSize="11"
-                    fill="#4a4340"
-                  >
-                    {d.count}
-                  </text>
-                </>
-              )}
-              <title>{`${formatDate(d.day)}: ${d.count} ${d.count === 1 ? 'alta' : 'altas'}`}</title>
-            </g>
-          );
-        })}
-
-        {/* Solo los extremos del eje: el resto se lee al pasar el cursor */}
-        <text x="0" y={height - 6} fontSize="11" fill="#8a807c">
-          {formatDate(data[0].day)}
-        </text>
-        <text
-          x={width}
-          y={height - 6}
-          fontSize="11"
-          fill="#8a807c"
-          textAnchor="end"
-        >
-          {formatDate(data[data.length - 1].day)}
-        </text>
-      </svg>
-
-      {/* Misma información en texto, para lectura no visual */}
-      <table className="sr-only">
-        <caption>Altas de cuentas por día</caption>
-        <thead>
-          <tr>
-            <th scope="col">Día</th>
-            <th scope="col">Altas</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((d) => (
-            <tr key={d.day}>
-              <td>{formatDate(d.day)}</td>
-              <td>{d.count}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </figure>
-  );
-}
-
-/** Distribución por carrera: pocas categorías, barras horizontales etiquetadas. */
-function CareerBars({ data }: { data: { career: string; count: number }[] }) {
-  const max = Math.max(1, ...data.map((d) => d.count));
-
-  return (
-    <ul className="flex flex-col gap-2.5 m-0 p-0 list-none">
-      {data.map((d) => (
-        <li key={d.career} className="flex items-center gap-3">
-          <span
-            className="w-[132px] flex-none text-[13px] text-[#4a4340] truncate"
-            title={d.career}
-          >
-            {d.career}
-          </span>
-          <span className="flex-1 h-[14px] bg-[#f1ece9] rounded-[4px] overflow-hidden">
-            <span
-              className="block h-full bg-[#d62828] rounded-[4px]"
-              style={{ width: `${(d.count / max) * 100}%` }}
-            />
-          </span>
-          <span className="w-[28px] flex-none text-right text-[13px] font-semibold text-[#171313]">
-            {d.count}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
+const TIME = new Intl.DateTimeFormat('es-DO', {
+  hour: '2-digit',
+  minute: '2-digit',
+});
 
 export function DashboardScreen() {
-  const { users, posts, reports } = useAdminState();
-
-  const indicators = usageIndicators(users, posts, reports);
-  const signups = signupsByDay(users, DAYS);
-  const careers = usersByCareer(users);
+  const { data, error, isPending, refetch } = useDashboardMetrics();
 
   return (
     <section className="max-w-[1180px]">
@@ -220,72 +83,78 @@ export function DashboardScreen() {
         </p>
       </header>
 
-      {/* Indicadores generales de uso */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 mb-6">
-        <StatTile
-          icon={Users}
-          label="Cuentas registradas"
-          value={indicators.totalUsers}
-          hint={`${indicators.newUsers7d} altas en los últimos 7 días`}
-          to="/usuarios"
-        />
-        <StatTile
-          icon={UserCheck}
-          label="Cuentas activas"
-          value={indicators.activeUsers}
-          hint="Con acceso a la plataforma"
-          to="/usuarios"
-        />
-        <StatTile
-          icon={UserX}
-          label="Cuentas inactivas"
-          value={indicators.inactiveUsers}
-          hint="Acceso restringido, registro conservado"
-          to="/usuarios"
-        />
-        <StatTile
-          icon={BadgeCheck}
-          label="Verificaciones pendientes"
-          value={indicators.pendingVerification}
-          hint="Cuentas por confirmar como institucionales"
-          to="/usuarios"
-          urgent={indicators.pendingVerification > 0}
-        />
-        <StatTile
-          icon={Flag}
-          label="Reportes pendientes"
-          value={indicators.pendingReports}
-          hint="Denuncias de la comunidad sin revisar"
-          to="/reportes"
-          urgent={indicators.pendingReports > 0}
-        />
-        <StatTile
-          icon={FileText}
-          label="Publicaciones activas"
-          value={indicators.activePosts}
-          hint="Contenido visible en el feed"
-        />
-      </div>
+      {isPending && (
+        <p
+          role="status"
+          className="flex items-center gap-2 text-[14px] text-[#8a807c]"
+        >
+          <CircleDashed className="w-4 h-4" aria-hidden />
+          Cargando indicadores…
+        </p>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white border border-[#e3ddd9] rounded-[18px] p-5">
-          <h2 className="font-['Space_Grotesk',sans-serif] font-bold text-[16px] mb-1">
-            Altas de cuentas por día
-          </h2>
-          <p className="text-[13px] text-[#8a807c] mb-4">Últimos {DAYS} días</p>
-          <SignupsChart data={signups} />
-        </div>
-
-        <div className="bg-white border border-[#e3ddd9] rounded-[18px] p-5">
-          <h2 className="font-['Space_Grotesk',sans-serif] font-bold text-[16px] mb-1">
-            Cuentas por carrera
-          </h2>
-          <p className="text-[13px] text-[#8a807c] mb-4">
-            Distribución del padrón registrado
+      {error && (
+        <div
+          role="alert"
+          className="bg-white border border-[#e3ddd9] rounded-[18px] p-5 max-w-[520px]"
+        >
+          <p className="text-[15px] text-[#4a4340] mb-3">
+            {userMessageOf(error)}
           </p>
-          <CareerBars data={careers} />
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="rounded-full border border-[#e3ddd9] px-4 py-1.5 text-[13px] hover:border-[#d62828]"
+          >
+            Reintentar
+          </button>
         </div>
-      </div>
+      )}
+
+      {data && (
+        <>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-4">
+            <StatTile
+              icon={Flag}
+              label="Reportes pendientes"
+              value={data.pendingReports}
+              hint="Denuncias de la comunidad sin revisar"
+              to="/reportes"
+              urgent={data.pendingReports > 0}
+            />
+            <StatTile
+              icon={BadgeCheck}
+              label="Cuentas por verificar"
+              value={data.pendingVerifications}
+              hint="Estudiantes sin confirmar como institucionales"
+              to="/usuarios"
+              urgent={data.pendingVerifications > 0}
+            />
+            <StatTile
+              icon={Users}
+              label="Usuarios activos"
+              value={data.users.total}
+              hint={`${data.users.last7Days} altas en los últimos 7 días`}
+              to="/usuarios"
+            />
+            <StatTile
+              icon={FileText}
+              label="Publicaciones"
+              value={data.posts.total}
+              hint={`${data.posts.last7Days} nuevas en los últimos 7 días`}
+            />
+            <StatTile
+              icon={CircleDashed}
+              label="Historias vigentes"
+              value={data.activeStories}
+              hint="Aún no vencen y no están desactivadas"
+            />
+          </div>
+          <p className="text-[12px] text-[#8a807c]">
+            Actualizado a las {TIME.format(new Date(data.generatedAt))}
+          </p>
+        </>
+      )}
     </section>
   );
 }
