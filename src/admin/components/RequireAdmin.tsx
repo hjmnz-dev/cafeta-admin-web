@@ -1,13 +1,14 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ShieldAlert } from 'lucide-react';
-import { useAdminState } from '../store/AdminState';
+import { useSession } from '../store/SessionStore';
 
 /**
  * HU43 (escenario 2) · HU48 (escenario 2) — Control de acceso.
  *
- * Sin permisos administrativos no se muestra la sección, y el intento se anota
- * en la bitácora (HU46, escenario 2): un acceso denegado que no deja rastro no
- * sirve para investigar nada después.
+ * La consola ya solo abre con una sesión de administrador, y la API rechaza
+ * con 403 (y lo audita como access.denied) cualquier ruta /admin de otra
+ * cuenta. Esto es la segunda barrera, por sección: si la sesión no es de
+ * admin, no se muestra nada.
  */
 export function RequireAdmin({
   section,
@@ -16,19 +17,9 @@ export function RequireAdmin({
   section: string;
   children: ReactNode;
 }) {
-  const { isAdmin, logAccessDenied } = useAdminState();
-  const logged = useRef(false);
+  const { user } = useSession();
 
-  useEffect(() => {
-    // Una sola anotación por visita denegada, no una por repintado.
-    if (!isAdmin && !logged.current) {
-      logged.current = true;
-      logAccessDenied(section);
-    }
-    if (isAdmin) logged.current = false;
-  }, [isAdmin, section, logAccessDenied]);
-
-  if (isAdmin) return <>{children}</>;
+  if (user?.role === 'ADMIN') return <>{children}</>;
 
   return (
     <div className="max-w-[560px] mx-auto mt-16 bg-white border border-[#e3ddd9] rounded-[20px] p-8 text-center">
@@ -41,8 +32,7 @@ export function RequireAdmin({
       </h1>
       <p className="text-[15px] text-[#8a807c] leading-relaxed">
         Tu cuenta no tiene permisos administrativos para ver{' '}
-        <strong className="text-[#4a4340]">{section}</strong>. El intento quedó
-        registrado en la bitácora de auditoría.
+        <strong className="text-[#4a4340]">{section}</strong>.
       </p>
     </div>
   );

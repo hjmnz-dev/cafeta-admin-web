@@ -1,17 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import {
-  usageIndicators,
-  signupsByDay,
-  usersByCareer,
-  buildReport,
-  toCsv,
-} from './metrics';
-import type {
-  AdminPost,
-  AdminReport,
-  AdminUser,
-  AuditEntry,
-} from '../store/AdminState';
+import { buildReport, toCsv } from './metrics';
+import type { AdminReport, AdminUser, AuditEntry } from '../store/AdminState';
 
 const DAY = 24 * 60 * 60 * 1000;
 /** Mediodía, para que sumar y restar días no cruce fronteras por el horario. */
@@ -41,16 +30,6 @@ const report = (patch: Partial<AdminReport>): AdminReport => ({
   ...patch,
 });
 
-const post = (patch: Partial<AdminPost>): AdminPost => ({
-  id: 'p1',
-  authorId: 'u1',
-  authorName: 'María Rodríguez',
-  content: 'Contenido',
-  createdAt: NOW - DAY,
-  active: true,
-  ...patch,
-});
-
 const entry = (patch: Partial<AuditEntry>): AuditEntry => ({
   id: 'a1',
   at: NOW - DAY,
@@ -61,59 +40,6 @@ const entry = (patch: Partial<AuditEntry>): AuditEntry => ({
   detail: 'Cuenta desactivada.',
   succeeded: true,
   ...patch,
-});
-
-describe('HU43 — Indicadores del dashboard', () => {
-  it('resume el estado de cuentas, contenido y trabajo pendiente', () => {
-    const users = [
-      user({ id: 'a' }),
-      user({ id: 'b', status: 'inactive' }),
-      user({ id: 'c', verification: 'pending' }),
-      user({ id: 'd', joinedAt: NOW - 20 * DAY }),
-    ];
-    const posts = [post({ id: 'p1' }), post({ id: 'p2', active: false })];
-    const reports = [
-      report({ id: 'r1' }),
-      report({ id: 'r2', status: 'dismissed' }),
-    ];
-
-    expect(usageIndicators(users, posts, reports, NOW)).toEqual({
-      totalUsers: 4,
-      activeUsers: 3,
-      inactiveUsers: 1,
-      pendingVerification: 1,
-      pendingReports: 1,
-      activePosts: 1,
-      newUsers7d: 3,
-    });
-  });
-
-  it('la serie de altas cubre todos los días, también los que no tuvieron ninguna', () => {
-    const users = [
-      user({ id: 'a' }),
-      user({ id: 'b' }),
-      user({ id: 'c', joinedAt: NOW }),
-    ];
-
-    const serie = signupsByDay(users, 5, NOW);
-
-    expect(serie).toHaveLength(5);
-    // Dos altas hace dos días, una hoy, y ceros explícitos en el resto.
-    expect(serie.map((d) => d.count)).toEqual([0, 0, 2, 0, 1]);
-  });
-
-  it('la distribución por carrera va de mayor a menor', () => {
-    const users = [
-      user({ id: 'a', career: 'Medicina' }),
-      user({ id: 'b', career: 'Ing. Software' }),
-      user({ id: 'c', career: 'Ing. Software' }),
-    ];
-
-    expect(usersByCareer(users)).toEqual([
-      { career: 'Ing. Software', count: 2 },
-      { career: 'Medicina', count: 1 },
-    ]);
-  });
 });
 
 describe('HU44 — Informes administrativos', () => {

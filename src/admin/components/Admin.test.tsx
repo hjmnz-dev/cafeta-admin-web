@@ -1,64 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DashboardScreen } from './DashboardScreen';
 import { UsersScreen } from './UsersScreen';
 import { ReportsReviewScreen } from './ReportsReviewScreen';
 import { AuditLogScreen } from './AuditLogScreen';
 import { AdminReportsScreen } from './AdminReportsScreen';
-import { RequireAdmin } from './RequireAdmin';
-import { AdminLayout } from './AdminLayout';
 import { renderWithProviders } from '../../test/utils';
-
-/** Cambia el rol de la sesión desde la cabecera de la consola. */
-async function signInAs(
-  user: ReturnType<typeof userEvent.setup>,
-  role: 'Administrador' | 'Estudiante',
-) {
-  await user.selectOptions(
-    screen.getByRole('combobox', { name: /rol de la sesión/i }),
-    role,
-  );
-}
-
-describe('HU43 — Ver dashboard administrativo', () => {
-  it('Escenario 1 — el administrador ve los indicadores generales de uso', () => {
-    renderWithProviders(
-      <RequireAdmin section="el dashboard">
-        <DashboardScreen />
-      </RequireAdmin>,
-    );
-
-    expect(screen.getByText('Cuentas registradas')).toBeInTheDocument();
-    expect(screen.getByText('Reportes pendientes')).toBeInTheDocument();
-    // El padrón de demostración trae 8 cuentas, 7 de ellas activas.
-    expect(screen.getByText('Cuentas activas').closest('a')).toHaveTextContent(
-      '7',
-    );
-  });
-
-  it('Escenario 2 — a un estudiante se le deniega el acceso y queda registrado', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(
-      <>
-        <AdminLayout />
-        <RequireAdmin section="el dashboard administrativo">
-          <DashboardScreen />
-        </RequireAdmin>
-        <AuditLogScreen />
-      </>,
-    );
-
-    await signInAs(user, 'Estudiante');
-
-    expect(
-      screen.getByRole('heading', { name: /acceso denegado/i }),
-    ).toBeInTheDocument();
-    expect(screen.queryByText('Cuentas registradas')).not.toBeInTheDocument();
-    // HU46, escenario 2: el intento rechazado deja rastro.
-    expect(screen.getAllByLabelText('Rechazada').length).toBeGreaterThan(0);
-  });
-});
 
 describe('HU47 — Ver listado de usuarios', () => {
   it('Escenario 1 — lista las cuentas con su estado y datos básicos', () => {
@@ -123,27 +70,6 @@ describe('HU48/HU49 — Desactivar y reactivar cuentas', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(/se restringe su acceso y se conserva su registro/i),
-    ).toBeInTheDocument();
-  });
-
-  it('HU48, escenario 2 — un estudiante no puede desactivar cuentas', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(
-      <>
-        <AdminLayout />
-        <RequireAdmin section="el listado de usuarios">
-          <UsersScreen />
-        </RequireAdmin>
-      </>,
-    );
-
-    await signInAs(user, 'Estudiante');
-
-    expect(
-      screen.queryByRole('button', { name: /desactivar cuenta de/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: /acceso denegado/i }),
     ).toBeInTheDocument();
   });
 

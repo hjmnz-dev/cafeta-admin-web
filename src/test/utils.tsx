@@ -1,7 +1,13 @@
 import type { ReactElement } from 'react';
 import { render } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router';
-import { AdminStateProvider } from '../admin/store/AdminState';
+import { AdminStateProvider, type Actor } from '../admin/store/AdminState';
+
+/** Administrador de las pruebas: quien actúa en la bitácora. */
+export const TEST_ACTOR: Actor = {
+  name: 'Hamsell Jiménez',
+  email: 'hjimenez@intec.edu.do',
+};
 
 /** Muestra la ruta actual para poder afirmar navegaciones en las pruebas. */
 export function LocationProbe() {
@@ -18,7 +24,7 @@ export function renderWithProviders(
   { route = '/' }: { route?: string } = {},
 ) {
   return render(
-    <AdminStateProvider>
+    <AdminStateProvider actor={TEST_ACTOR}>
       <MemoryRouter initialEntries={[route]}>
         <LocationProbe />
         <Routes>
@@ -38,7 +44,7 @@ export function renderRoutes(
   { route }: { route: string },
 ) {
   return render(
-    <AdminStateProvider>
+    <AdminStateProvider actor={TEST_ACTOR}>
       <MemoryRouter initialEntries={[route]}>
         <LocationProbe />
         <Routes>

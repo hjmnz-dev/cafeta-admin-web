@@ -13,11 +13,11 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
  * bitácora se lee del servidor manteniendo la misma forma de datos.
  */
 
-/** Rol de la sesión. Sin autenticación real, se elige al entrar. */
+/** Rol de quien actúa en la bitácora. */
 export type Role = 'admin' | 'student';
 
-export interface Session {
-  role: Role;
+/** Quien usa la consola: el administrador que inició sesión en la API. */
+export interface Actor {
   name: string;
   email: string;
 }
@@ -108,10 +108,7 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
 };
 
 interface AdminStateValue {
-  session: Session;
-  /** Cambiar de sesión. Sin login real, sirve para probar los permisos. */
-  signIn: (role: Role) => void;
-  isAdmin: boolean;
+  actor: Actor;
 
   users: AdminUser[];
   posts: AdminPost[];
@@ -130,8 +127,6 @@ interface AdminStateValue {
   /** HU51/HU52 — Resolver una denuncia: sancionar o desestimar. */
   sanctionReport: (reportId: string) => boolean;
   dismissReport: (reportId: string) => boolean;
-  /** HU46 — Dejar constancia de un intento sin permisos. */
-  logAccessDenied: (target: string) => void;
   /** HU44 — Registrar en bitácora la generación de un reporte administrativo. */
   logReportGenerated: (detail: string) => void;
 }
@@ -146,13 +141,6 @@ const CAREERS = [
 ];
 
 const DAY = 24 * 60 * 60 * 1000;
-
-/** Sesión por defecto: administrador, que es para quien existe esta consola. */
-const DEFAULT_SESSION: Session = {
-  role: 'admin',
-  name: 'Hamsell Jiménez',
-  email: 'hjimenez@intec.edu.do',
-};
 
 /**
  * Padrón de demostración. Se construye con fechas relativas al arranque para
@@ -403,7 +391,6 @@ const sampleAudit = (): AuditEntry[] => {
 const STORAGE_KEY = 'cafeta.admin.v1';
 
 interface PersistedState {
-  session: Session;
   users: AdminUser[];
   posts: AdminPost[];
   reports: AdminReport[];
@@ -416,7 +403,6 @@ function load(): PersistedState {
     if (raw) {
       const parsed = JSON.parse(raw);
       return {
-        session: { ...DEFAULT_SESSION, ...parsed.session },
         users: Array.isArray(parsed.users) ? parsed.users : sampleUsers(),
         posts: Array.isArray(parsed.posts) ? parsed.posts : samplePosts(),
         reports: Array.isArray(parsed.reports)
@@ -429,7 +415,6 @@ function load(): PersistedState {
     /* storage no disponible o corrupto: usar datos de demostración */
   }
   return {
-    session: DEFAULT_SESSION,
     users: sampleUsers(),
     posts: samplePosts(),
     reports: sampleReports(),
@@ -443,37 +428,24 @@ const nextAuditId = () => `audit-${Date.now()}-${++auditSeq}`;
 const AdminStateContext = createContext<AdminStateValue | null>(null);
 
 export function AdminStateProvider({
+  actor,
   children,
 }: {
+  actor: Actor;
   children: React.ReactNode;
 }) {
-  const [{ session, users, posts, reports, audit }, setState] = useState(load);
+  const [{ users, posts, reports, audit }, setState] = useState(load);
 
   useEffect(() => {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ session, users, posts, reports, audit }),
+        JSON.stringify({ users, posts, reports, audit }),
       );
     } catch {
       /* almacenamiento no disponible: el estado sigue solo en memoria */
     }
-  }, [session, users, posts, reports, audit]);
-
-  const isAdmin = session.role === 'admin';
-
-  const signIn = (role: Role) =>
-    setState((s) => ({
-      ...s,
-      session:
-        role === 'admin'
-          ? DEFAULT_SESSION
-          : {
-              role: 'student',
-              name: 'Carlos Gómez',
-              email: 'cgomez@est.intec.edu.do',
-            },
-    }));
+  }, [users, posts, reports, audit]);
 
   /** Añade una entrada a la bitácora. Toda acción pasa por aquí (HU46). */
   const record = (
@@ -488,8 +460,8 @@ export function AdminStateProvider({
       {
         id: nextAuditId(),
         at: Date.now(),
-        actor: s.session.name,
-        actorRole: s.session.role,
+        actor: actor.name,
+        actorRole: 'admin',
         action,
         target,
         detail,
@@ -501,7 +473,6 @@ export function AdminStateProvider({
 
   /** Estado actual como una sola pieza, para decidir y registrar sobre él. */
   const snapshot = (): PersistedState => ({
-    session,
     users,
     posts,
     reports,
@@ -509,8 +480,8 @@ export function AdminStateProvider({
   });
 
   /**
-   * Ejecuta una acción administrativa con una sola regla: sin permisos no se
-   * toca el estado, pero el intento igual queda registrado (HU46, escenario 2).
+   * Ejecuta una acción administrativa y la deja en la bitácora (HU46); el
+   * acceso lo decide la API, que rechaza a quien no es admin.
    *
    * Decide sobre el estado ya renderizado y devuelve el resultado en el acto,
    * para que quien llama pueda avisar en pantalla si la acción no procedía.
@@ -523,18 +494,6 @@ export function AdminStateProvider({
     ) => { state: PersistedState; detail: string } | { error: string },
   ): boolean => {
     const s = snapshot();
-    if (s.session.role !== 'admin') {
-      setState(
-        record(
-          s,
-          'access.denied',
-          target,
-          `Intento de "${AUDIT_ACTION_LABELS[action]}" sin permisos administrativos.`,
-          false,
-        ),
-      );
-      return false;
-    }
     const result = run(s);
     if ('error' in result) {
       setState(record(s, action, target, result.error, false));
@@ -634,7 +593,7 @@ export function AdminStateProvider({
     ...s,
     reports: s.reports.map((r) =>
       r.id === reportId
-        ? { ...r, status, resolvedBy: s.session.name, resolvedAt: Date.now() }
+        ? { ...r, status, resolvedBy: actor.name, resolvedAt: Date.now() }
         : r,
     ),
   });
@@ -683,17 +642,6 @@ export function AdminStateProvider({
       };
     });
 
-  const logAccessDenied = (target: string) =>
-    setState(
-      record(
-        snapshot(),
-        'access.denied',
-        target,
-        'Intento de acceso a una sección administrativa sin permisos.',
-        false,
-      ),
-    );
-
   const logReportGenerated = (detail: string) =>
     setState(
       record(snapshot(), 'report.generate', 'Reportes administrativos', detail),
@@ -702,9 +650,7 @@ export function AdminStateProvider({
   return (
     <AdminStateContext.Provider
       value={{
-        session,
-        signIn,
-        isAdmin,
+        actor,
         users,
         posts,
         reports,
@@ -716,7 +662,6 @@ export function AdminStateProvider({
         deactivatePost,
         sanctionReport,
         dismissReport,
-        logAccessDenied,
         logReportGenerated,
       }}
     >
