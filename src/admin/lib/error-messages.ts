@@ -12,6 +12,9 @@ const MESSAGES: Readonly<Record<string, string>> = {
   UNAUTHORIZED: 'Tu sesión terminó. Inicia sesión de nuevo.',
   TOO_MANY_REQUESTS: 'Demasiados intentos. Espera un minuto.',
   VALIDATION_ERROR: 'Revisa los datos del formulario.',
+  INVALID_DATE_RANGE:
+    'Revisa las fechas: la inicial no puede ser posterior a la final.',
+  RANGE_TOO_LARGE: 'El rango no puede pasar de 92 días.',
   NETWORK_ERROR: 'No hay conexión con la API. Intenta de nuevo.',
 };
 
