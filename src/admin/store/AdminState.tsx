@@ -115,13 +115,6 @@ interface AdminStateValue {
   reports: AdminReport[];
   audit: AuditEntry[];
 
-  /** HU48 — Desactivar cuenta. Devuelve false si no había permiso o ya estaba inactiva. */
-  deactivateAccount: (id: string) => boolean;
-  /** HU49 — Reactivar cuenta. Devuelve false si ya estaba activa o no hay permiso. */
-  reactivateAccount: (id: string) => boolean;
-  /** HU50 — Aprobar o rechazar la verificación institucional. */
-  verifyAccount: (id: string) => boolean;
-  rejectVerification: (id: string) => boolean;
   /** HU52 — Desactivar una publicación reportada. */
   deactivatePost: (id: string) => boolean;
   /** HU51/HU52 — Resolver una denuncia: sancionar o desestimar. */
@@ -515,53 +508,6 @@ export function AdminStateProvider({
     users: s.users.map((u) => (u.id === id ? { ...u, ...patch } : u)),
   });
 
-  const deactivateAccount = (id: string) =>
-    adminAction('account.deactivate', id, (s) => {
-      const user = findUser(s, id);
-      if (!user) return { error: 'La cuenta no existe.' };
-      if (user.status === 'inactive')
-        return { error: `La cuenta de ${user.name} ya estaba inactiva.` };
-      return {
-        state: setUser(s, id, { status: 'inactive' }),
-        detail: `Cuenta de ${user.name} desactivada: se restringe su acceso y se conserva su registro.`,
-      };
-    });
-
-  const reactivateAccount = (id: string) =>
-    adminAction('account.reactivate', id, (s) => {
-      const user = findUser(s, id);
-      if (!user) return { error: 'La cuenta no existe.' };
-      // HU49, escenario 2: reactivar algo ya activo no es un cambio, es un aviso.
-      if (user.status === 'active')
-        return { error: `La cuenta de ${user.name} ya se encuentra activa.` };
-      return {
-        state: setUser(s, id, { status: 'active' }),
-        detail: `Cuenta de ${user.name} reactivada: se restaura su acceso.`,
-      };
-    });
-
-  const verifyAccount = (id: string) =>
-    adminAction('account.verify', id, (s) => {
-      const user = findUser(s, id);
-      if (!user) return { error: 'La cuenta no existe.' };
-      if (user.verification === 'verified')
-        return { error: `La cuenta de ${user.name} ya estaba verificada.` };
-      return {
-        state: setUser(s, id, { verification: 'verified' }),
-        detail: `Cuenta de ${user.name} verificada como miembro de la universidad.`,
-      };
-    });
-
-  const rejectVerification = (id: string) =>
-    adminAction('account.reject_verification', id, (s) => {
-      const user = findUser(s, id);
-      if (!user) return { error: 'La cuenta no existe.' };
-      return {
-        state: setUser(s, id, { verification: 'rejected' }),
-        detail: `Verificación de ${user.name} rechazada: los datos no pudieron confirmarse.`,
-      };
-    });
-
   const deactivatePost = (id: string) =>
     adminAction('post.deactivate', id, (s) => {
       const post = s.posts.find((p) => p.id === id);
@@ -655,10 +601,6 @@ export function AdminStateProvider({
         posts,
         reports,
         audit,
-        deactivateAccount,
-        reactivateAccount,
-        verifyAccount,
-        rejectVerification,
         deactivatePost,
         sanctionReport,
         dismissReport,

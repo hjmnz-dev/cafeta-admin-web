@@ -13,6 +13,14 @@ const MESSAGES: Readonly<Record<string, string>> = {
   TOO_MANY_REQUESTS: 'Demasiados intentos. Espera un minuto.',
   VALIDATION_ERROR: 'Revisa los datos del formulario.',
   NETWORK_ERROR: 'No hay conexión con la API. Intenta de nuevo.',
+  USER_NOT_FOUND: 'Esa cuenta ya no existe.',
+  INVALID_CURSOR: 'La lista cambió. Vuelve a cargarla.',
+  ALREADY_INACTIVE: 'La cuenta ya estaba desactivada.',
+  ALREADY_ACTIVE: 'La cuenta ya estaba activa.',
+  VERIFICATION_ALREADY_DECIDED:
+    'Esta cuenta ya tiene una decisión de verificación.',
+  CANNOT_ACT_ON_SELF: 'No puedes actuar sobre tu propia cuenta.',
+  CANNOT_SANCTION_ADMIN: 'No se puede desactivar a otro administrador.',
 };
 
 export const GENERIC_ERROR_MESSAGE = 'Algo salió mal. Intenta de nuevo.';

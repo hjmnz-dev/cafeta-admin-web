@@ -1,157 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { UsersScreen } from './UsersScreen';
 import { ReportsReviewScreen } from './ReportsReviewScreen';
 import { AuditLogScreen } from './AuditLogScreen';
 import { AdminReportsScreen } from './AdminReportsScreen';
 import { renderWithProviders } from '../../test/utils';
+import { useAdminState } from '../store/AdminState';
 
-describe('HU47 — Ver listado de usuarios', () => {
-  it('Escenario 1 — lista las cuentas con su estado y datos básicos', () => {
-    renderWithProviders(<UsersScreen />);
-
-    expect(screen.getByText('María Rodríguez')).toBeInTheDocument();
-    expect(screen.getByText('amartinez@est.intec.edu.do')).toBeInTheDocument();
-    expect(screen.getAllByText('Activa').length).toBeGreaterThan(0);
-    expect(screen.getByText('Inactiva')).toBeInTheDocument();
-  });
-
-  it('Escenario 2 — la búsqueda filtra por nombre o correo', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<UsersScreen />);
-
-    await user.type(
-      screen.getByRole('searchbox', { name: /buscar por nombre o correo/i }),
-      'jperez',
-    );
-
-    expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
-    expect(screen.queryByText('María Rodríguez')).not.toBeInTheDocument();
-  });
-
-  it('avisa cuando ninguna cuenta coincide', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<UsersScreen />);
-
-    await user.type(
-      screen.getByRole('searchbox', { name: /buscar por nombre o correo/i }),
-      'zzzzz',
-    );
-
-    expect(screen.getByText(/ninguna cuenta coincide/i)).toBeInTheDocument();
-  });
-});
-
-describe('HU48/HU49 — Desactivar y reactivar cuentas', () => {
-  it('HU48, escenario 1 — desactivar cambia el estado y queda en la bitácora', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(
-      <>
-        <UsersScreen />
-        <AuditLogScreen />
-      </>,
-    );
-
-    await user.click(
-      screen.getByRole('button', { name: /desactivar cuenta de juan pérez/i }),
-    );
-    await user.click(
-      within(screen.getByRole('dialog')).getByRole('button', {
-        name: /desactivar cuenta/i,
-      }),
-    );
-
-    expect(screen.getByRole('status')).toHaveTextContent(
-      /cuenta de juan pérez desactivada/i,
-    );
-    expect(
-      screen.getByRole('button', { name: /reactivar cuenta de juan pérez/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/se restringe su acceso y se conserva su registro/i),
-    ).toBeInTheDocument();
-  });
-
-  it('HU49, escenario 1 — reactivar restaura el acceso', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<UsersScreen />);
-
-    // Ana Martínez arranca inactiva en los datos de demostración.
-    await user.click(
-      screen.getByRole('button', { name: /reactivar cuenta de ana martínez/i }),
-    );
-    await user.click(
-      within(screen.getByRole('dialog')).getByRole('button', {
-        name: /reactivar cuenta/i,
-      }),
-    );
-
-    expect(screen.getByRole('status')).toHaveTextContent(
-      /cuenta de ana martínez reactivada/i,
-    );
-    expect(
-      screen.getByRole('button', {
-        name: /desactivar cuenta de ana martínez/i,
-      }),
-    ).toBeInTheDocument();
-  });
-
-  it('HU49, escenario 2 — no ofrece reactivar una cuenta que ya está activa', () => {
-    renderWithProviders(<UsersScreen />);
-
-    expect(
-      screen.queryByRole('button', {
-        name: /reactivar cuenta de maría rodríguez/i,
-      }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', {
-        name: /desactivar cuenta de maría rodríguez/i,
-      }),
-    ).toBeInTheDocument();
-  });
-});
-
-describe('HU50 — Verificar cuenta institucional', () => {
-  it('Escenario 1 — aprobar la verificación marca la cuenta como verificada', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<UsersScreen />);
-
-    await user.click(
-      screen.getByRole('button', {
-        name: /verificar cuenta de laura batista/i,
-      }),
-    );
-
-    expect(screen.getByRole('status')).toHaveTextContent(
-      /verificada como institucional/i,
-    );
-    expect(
-      screen.queryByRole('button', {
-        name: /verificar cuenta de laura batista/i,
-      }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('Escenario 2 — rechazar la deja como no verificada', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<UsersScreen />);
-
-    await user.click(
-      screen.getByRole('button', {
-        name: /rechazar verificación de pedro sánchez/i,
-      }),
-    );
-
-    expect(screen.getByRole('status')).toHaveTextContent(/rechazada/i);
-    expect(
-      screen.queryByRole('button', {
-        name: /rechazar verificación de pedro sánchez/i,
-      }),
-    ).not.toBeInTheDocument();
-  });
-});
+/** Estado simulado de una cuenta: la 33 aún sanciona sobre este estado. */
+function AccountStatus({ name }: { name: string }) {
+  const { users } = useAdminState();
+  return (
+    <p data-testid="account-status">
+      {users.find((u) => u.name === name)?.status}
+    </p>
+  );
+}
 
 describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
   it('HU52, escenario 1 — sancionar desactiva la publicación y cierra el reporte', async () => {
@@ -182,7 +46,7 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
     renderWithProviders(
       <>
         <ReportsReviewScreen />
-        <UsersScreen />
+        <AccountStatus name="Roberto Díaz" />
       </>,
     );
 
@@ -192,9 +56,7 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
       }),
     );
 
-    expect(
-      screen.getByRole('button', { name: /reactivar cuenta de roberto díaz/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('account-status')).toHaveTextContent('inactive');
   });
 
   it('Escenario 2 — desestimar cierra el reporte sin tocar la cuenta', async () => {
@@ -202,7 +64,7 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
     renderWithProviders(
       <>
         <ReportsReviewScreen />
-        <UsersScreen />
+        <AccountStatus name="Roberto Díaz" />
       </>,
     );
 
@@ -213,12 +75,8 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
     );
 
     expect(screen.getByRole('status')).toHaveTextContent(/desestimado/i);
-    // La cuenta sigue activa: se ofrece desactivarla, no reactivarla.
-    expect(
-      screen.getByRole('button', {
-        name: /desactivar cuenta de roberto díaz/i,
-      }),
-    ).toBeInTheDocument();
+    // La cuenta sigue activa.
+    expect(screen.getByTestId('account-status')).toHaveTextContent('active');
   });
 
   it('un reporte resuelto sale de la lista de pendientes', async () => {
@@ -281,30 +139,6 @@ describe('HU45/HU46 — Bitácora de auditoría', () => {
     );
 
     expect(screen.getByText(/ningún registro coincide/i)).toBeInTheDocument();
-  });
-
-  it('HU46 — cada acción administrativa deja su registro automáticamente', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(
-      <>
-        <UsersScreen />
-        <AuditLogScreen />
-      </>,
-    );
-
-    const antes = screen.getAllByRole('row').length;
-    await user.click(
-      screen.getByRole('button', {
-        name: /verificar cuenta de laura batista/i,
-      }),
-    );
-
-    expect(screen.getAllByRole('row').length).toBeGreaterThan(antes);
-    expect(
-      screen.getByText(
-        /laura batista verificada como miembro de la universidad/i,
-      ),
-    ).toBeInTheDocument();
   });
 });
 
