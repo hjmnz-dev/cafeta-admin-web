@@ -747,6 +747,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/reports': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Cola de reportes con filtros (solo admin) */
+    get: operations['AdminReportsController_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/reports/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Detalle de un reporte y sus pendientes hermanos */
+    get: operations['AdminReportsController_detail'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/reports/{id}/resolve': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Desestimar el reporte o sancionar al objetivo */
+    post: operations['AdminReportsController_resolve'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1220,6 +1271,90 @@ export interface components {
        * @enum {string}
        */
       decision: 'VERIFIED' | 'REJECTED';
+    };
+    /** @enum {string} */
+    ReportTarget: 'USER' | 'POST';
+    /** @enum {string} */
+    ReportReason:
+      'SPAM' | 'HARASSMENT' | 'INAPPROPRIATE' | 'IMPERSONATION' | 'OTHER';
+    /** @enum {string} */
+    ReportStatus: 'PENDING' | 'SANCTIONED' | 'DISMISSED';
+    ReportPersonDto: {
+      id: string;
+      /** @example cgomez_intec */
+      handle: string;
+      displayName: string;
+    };
+    AdminReportTargetDto: {
+      /** @description Usuario reportado; null si el objetivo es una publicación. */
+      userId: string | null;
+      /** @description Publicación reportada; null si es un usuario o ya fue borrada. */
+      postId: string | null;
+      /** @description Usuario reportado, o autor de la publicación; null si la borraron. */
+      handle: string | null;
+      displayName: string | null;
+      /** @description true si la cuenta o la publicación siguen activas; null si ya no existe. */
+      active: boolean | null;
+      /** @description Copia del texto de la publicación al momento del reporte. */
+      snapshot: string | null;
+      /** @description Texto actual de la publicación; null si fue borrada o no es publicación. */
+      currentContent: string | null;
+      /** @enum {string|null} */
+      postState: 'ACTIVE' | 'ARCHIVED' | 'DEACTIVATED' | 'DELETED' | null;
+    };
+    AdminReportViewDto: {
+      targetType: components['schemas']['ReportTarget'];
+      reason: components['schemas']['ReportReason'];
+      details: string | null;
+      status: components['schemas']['ReportStatus'];
+      resolvedBy: components['schemas']['ReportPersonDto'] | null;
+      resolvedAt: string | null;
+      resolutionNote: string | null;
+      id: string;
+      reporter: components['schemas']['ReportPersonDto'];
+      target: components['schemas']['AdminReportTargetDto'];
+      /** @description Otros reportes pendientes sobre el mismo objetivo. */
+      otherPending: number;
+      /** @description Fecha del reporte en ISO 8601. */
+      createdAt: string;
+    };
+    AdminReportPageDto: {
+      nextCursor: string | null;
+      items: components['schemas']['AdminReportViewDto'][];
+    };
+    RelatedReportDto: {
+      reason: components['schemas']['ReportReason'];
+      details: string | null;
+      id: string;
+      reporter: components['schemas']['ReportPersonDto'];
+      createdAt: string;
+    };
+    AdminReportDetailDto: {
+      targetType: components['schemas']['ReportTarget'];
+      reason: components['schemas']['ReportReason'];
+      details: string | null;
+      status: components['schemas']['ReportStatus'];
+      resolvedBy: components['schemas']['ReportPersonDto'] | null;
+      resolvedAt: string | null;
+      resolutionNote: string | null;
+      id: string;
+      reporter: components['schemas']['ReportPersonDto'];
+      target: components['schemas']['AdminReportTargetDto'];
+      /** @description Otros reportes pendientes sobre el mismo objetivo. */
+      otherPending: number;
+      /** @description Fecha del reporte en ISO 8601. */
+      createdAt: string;
+      /** @description Los otros reportes pendientes sobre el mismo objetivo, del más antiguo. */
+      related: components['schemas']['RelatedReportDto'][];
+    };
+    ResolveReportDto: {
+      /** @description Obligatoria al sancionar (3 a 500 caracteres); opcional al desestimar. */
+      note?: string;
+      /**
+       * @description DISMISS cierra solo este reporte; DEACTIVATE_TARGET sanciona al objetivo.
+       * @enum {string}
+       */
+      action: 'DISMISS' | 'DEACTIVATE_TARGET';
     };
   };
   responses: never;
@@ -2452,6 +2587,120 @@ export interface operations {
         content?: never;
       };
       /** @description Ya tenía decisión: VERIFICATION_ALREADY_DECIDED */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminReportsController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+        /** @description PENDING (por defecto), SANCTIONED o DISMISSED. */
+        status: 'PENDING' | 'SANCTIONED' | 'DISMISSED';
+        /** @description USER o POST; sin valor, de los dos. */
+        targetType?: 'USER' | 'POST';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminReportPageDto'];
+        };
+      };
+      /** @description No es admin (FORBIDDEN), o intenta sancionarse a sí mismo (CANNOT_ACT_ON_SELF) o a otro admin (CANNOT_SANCTION_ADMIN) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminReportsController_detail: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminReportDetailDto'];
+        };
+      };
+      /** @description No es admin (FORBIDDEN), o intenta sancionarse a sí mismo (CANNOT_ACT_ON_SELF) o a otro admin (CANNOT_SANCTION_ADMIN) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description REPORT_NOT_FOUND */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminReportsController_resolve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResolveReportDto'];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No es admin (FORBIDDEN), o intenta sancionarse a sí mismo (CANNOT_ACT_ON_SELF) o a otro admin (CANNOT_SANCTION_ADMIN) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description REPORT_NOT_FOUND */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description REPORT_ALREADY_RESOLVED */
       409: {
         headers: {
           [name: string]: unknown;

@@ -115,11 +115,6 @@ interface AdminStateValue {
   reports: AdminReport[];
   audit: AuditEntry[];
 
-  /** HU52 — Desactivar una publicación reportada. */
-  deactivatePost: (id: string) => boolean;
-  /** HU51/HU52 — Resolver una denuncia: sancionar o desestimar. */
-  sanctionReport: (reportId: string) => boolean;
-  dismissReport: (reportId: string) => boolean;
   /** HU44 — Registrar en bitácora la generación de un reporte administrativo. */
   logReportGenerated: (detail: string) => void;
 }
@@ -472,122 +467,6 @@ export function AdminStateProvider({
     audit,
   });
 
-  /**
-   * Ejecuta una acción administrativa y la deja en la bitácora (HU46); el
-   * acceso lo decide la API, que rechaza a quien no es admin.
-   *
-   * Decide sobre el estado ya renderizado y devuelve el resultado en el acto,
-   * para que quien llama pueda avisar en pantalla si la acción no procedía.
-   */
-  const adminAction = (
-    action: AuditAction,
-    target: string,
-    run: (
-      s: PersistedState,
-    ) => { state: PersistedState; detail: string } | { error: string },
-  ): boolean => {
-    const s = snapshot();
-    const result = run(s);
-    if ('error' in result) {
-      setState(record(s, action, target, result.error, false));
-      return false;
-    }
-    setState(record(result.state, action, target, result.detail));
-    return true;
-  };
-
-  const findUser = (s: PersistedState, id: string) =>
-    s.users.find((u) => u.id === id);
-
-  const setUser = (
-    s: PersistedState,
-    id: string,
-    patch: Partial<AdminUser>,
-  ): PersistedState => ({
-    ...s,
-    users: s.users.map((u) => (u.id === id ? { ...u, ...patch } : u)),
-  });
-
-  const deactivatePost = (id: string) =>
-    adminAction('post.deactivate', id, (s) => {
-      const post = s.posts.find((p) => p.id === id);
-      if (!post) return { error: 'La publicación no existe.' };
-      if (!post.active)
-        return { error: 'La publicación ya estaba desactivada.' };
-      return {
-        state: {
-          ...s,
-          posts: s.posts.map((p) =>
-            p.id === id ? { ...p, active: false } : p,
-          ),
-        },
-        detail: `Publicación de ${post.authorName} desactivada por infringir las normas.`,
-      };
-    });
-
-  /** Nombre legible del objetivo de una denuncia, para la bitácora. */
-  const targetName = (s: PersistedState, report: AdminReport) =>
-    report.targetType === 'user'
-      ? (findUser(s, report.targetId)?.name ?? report.targetId)
-      : `Publicación ${report.targetId}`;
-
-  const resolveReport = (
-    s: PersistedState,
-    reportId: string,
-    status: Extract<ReportStatus, 'sanctioned' | 'dismissed'>,
-  ): PersistedState => ({
-    ...s,
-    reports: s.reports.map((r) =>
-      r.id === reportId
-        ? { ...r, status, resolvedBy: actor.name, resolvedAt: Date.now() }
-        : r,
-    ),
-  });
-
-  /**
-   * HU51/HU52 — Sancionar. La sanción aplica la restricción que corresponde al
-   * objetivo (desactivar la cuenta o la publicación) y cierra el reporte en un
-   * solo paso, que es como se toma la decisión en la práctica.
-   */
-  const sanctionReport = (reportId: string) =>
-    adminAction('report.sanction', reportId, (s) => {
-      const report = s.reports.find((r) => r.id === reportId);
-      if (!report) return { error: 'El reporte no existe.' };
-      if (report.status !== 'pending')
-        return { error: 'El reporte ya estaba resuelto.' };
-
-      const name = targetName(s, report);
-      const resolved = resolveReport(s, reportId, 'sanctioned');
-
-      if (report.targetType === 'user') {
-        return {
-          state: setUser(resolved, report.targetId, { status: 'inactive' }),
-          detail: `Reporte contra ${name} (${report.reason}) resuelto con sanción: cuenta desactivada.`,
-        };
-      }
-      return {
-        state: {
-          ...resolved,
-          posts: resolved.posts.map((p) =>
-            p.id === report.targetId ? { ...p, active: false } : p,
-          ),
-        },
-        detail: `Reporte contra ${name} (${report.reason}) resuelto con sanción: publicación desactivada.`,
-      };
-    });
-
-  const dismissReport = (reportId: string) =>
-    adminAction('report.dismiss', reportId, (s) => {
-      const report = s.reports.find((r) => r.id === reportId);
-      if (!report) return { error: 'El reporte no existe.' };
-      if (report.status !== 'pending')
-        return { error: 'El reporte ya estaba resuelto.' };
-      return {
-        state: resolveReport(s, reportId, 'dismissed'),
-        detail: `Reporte contra ${targetName(s, report)} desestimado: se cierra sin aplicar restricciones.`,
-      };
-    });
-
   const logReportGenerated = (detail: string) =>
     setState(
       record(snapshot(), 'report.generate', 'Reportes administrativos', detail),
@@ -601,9 +480,6 @@ export function AdminStateProvider({
         posts,
         reports,
         audit,
-        deactivatePost,
-        sanctionReport,
-        dismissReport,
         logReportGenerated,
       }}
     >
