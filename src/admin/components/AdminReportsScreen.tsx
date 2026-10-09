@@ -1,68 +1,56 @@
 import { useState } from 'react';
 import { Download, FileBarChart } from 'lucide-react';
-import { useAdminState } from '../store/AdminState';
-import {
-  buildReport,
-  toCsv,
-  REPORT_KINDS,
-  ReportKind,
-  GeneratedReport,
-} from '../lib/metrics';
-import { formatDate, toDateInput, startOfDay, endOfDay } from '../lib/format';
+import { userMessageOf } from '../lib/http';
+import { rangeProblem } from '../lib/report-range';
+import { REPORT_KINDS, type ReportKind } from '../lib/reports-api';
+import { toDateInput } from '../lib/format';
+import { useDownloadReport, useGenerateReport } from '../store/report-queries';
 
 /**
  * HU44 — Informes administrativos.
  *
  * A diferencia del dashboard, que da la foto inmediata, aquí se elige qué y de
  * cuándo, se visualiza el resultado y se descarga en CSV para analizarlo fuera.
- * Un rango sin actividad devuelve un informe vacío, no un error: eso también es
- * información y así lo dice la pantalla.
+ * La API calcula el informe con datos reales y lo audita. Un rango sin actividad
+ * no es un error: la pantalla lo dice y no ofrece la descarga.
  */
 
 const DAY = 24 * 60 * 60 * 1000;
 
 export function AdminReportsScreen() {
-  const { users, reports, audit, logReportGenerated } = useAdminState();
-
-  const [kind, setKind] = useState<ReportKind>('signups');
+  const [kind, setKind] = useState<ReportKind>('activity');
   const [from, setFrom] = useState(toDateInput(Date.now() - 30 * DAY));
   const [to, setTo] = useState(toDateInput(Date.now()));
-  const [result, setResult] = useState<GeneratedReport | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [problem, setProblem] = useState<string | null>(null);
 
-  const generate = () => {
-    if (startOfDay(from) > endOfDay(to)) {
-      setError('La fecha inicial no puede ser posterior a la final.');
-      setResult(null);
+  const generate = useGenerateReport();
+  const download = useDownloadReport();
+  const result = generate.data;
+
+  const onGenerate = () => {
+    const found = rangeProblem(from, to);
+    setProblem(found);
+    download.reset();
+    if (found) {
+      generate.reset();
       return;
     }
-    setError(null);
-
-    const generated = buildReport(
-      { users, reports, audit },
-      { kind, from: startOfDay(from), to: endOfDay(to) },
-    );
-    setResult(generated);
-    logReportGenerated(
-      `${generated.title}, del ${formatDate(generated.from)} al ${formatDate(generated.to)}: ${generated.rows.length} registros.`,
-    );
+    generate.mutate({ kind, from, to });
   };
 
-  const download = () => {
+  // El CSV es el del informe que se ve, aunque el formulario ya haya cambiado.
+  const onDownload = () => {
     if (!result) return;
-    // Descarga en el navegador: sin servidor, el archivo se arma en memoria.
-    const blob = new Blob([`﻿${toCsv(result)}`], {
-      type: 'text/csv;charset=utf-8',
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `cafeta-${result.kind}-${toDateInput(result.from)}-${toDateInput(result.to)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    download.mutate({ kind: result.kind, from: result.from, to: result.to });
   };
+
+  const alert = problem
+    ? problem
+    : generate.isError
+      ? userMessageOf(generate.error)
+      : download.isError
+        ? userMessageOf(download.error)
+        : null;
 
   const field =
     'rounded-[12px] border border-[#e3ddd9] bg-white px-3 py-2 text-[14px] outline-none focus:border-[#d62828]';
@@ -118,18 +106,20 @@ export function AdminReportsScreen() {
             />
           </label>
           <button
-            onClick={generate}
-            className="px-5 py-2.5 rounded-full text-[14px] font-semibold bg-[#d62828] text-white hover:bg-[#7e1418] transition-colors"
+            onClick={onGenerate}
+            disabled={generate.isPending}
+            className="px-5 py-2.5 rounded-full text-[14px] font-semibold bg-[#d62828] text-white hover:bg-[#7e1418] transition-colors disabled:opacity-60"
           >
-            Generar informe
+            {generate.isPending ? 'Generando…' : 'Generar informe'}
           </button>
         </div>
         <p className="text-[13px] text-[#8a807c] mt-3">
-          {REPORT_KINDS.find((k) => k.value === kind)!.description}
+          {REPORT_KINDS.find((k) => k.value === kind)!.description} Hasta 92
+          días, en hora de Santo Domingo.
         </p>
-        {error && (
+        {alert && (
           <p role="alert" className="mt-3 text-[14px] text-[#d62828]">
-            {error}
+            {alert}
           </p>
         )}
       </div>
@@ -143,21 +133,20 @@ export function AdminReportsScreen() {
                 {result.title}
               </h2>
               <p className="text-[13px] text-[#8a807c]">
-                Del {formatDate(result.from)} al {formatDate(result.to)} ·{' '}
-                {result.rows.length}{' '}
-                {result.rows.length === 1 ? 'registro' : 'registros'}
+                Del {result.from} al {result.to}
               </p>
             </div>
             <button
-              onClick={download}
-              disabled={result.rows.length === 0}
+              onClick={onDownload}
+              disabled={result.isEmpty || download.isPending}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors disabled:opacity-40 disabled:hover:border-[#e3ddd9] disabled:hover:text-[#4a4340]"
             >
-              <Download className="w-4 h-4" aria-hidden /> Descargar CSV
+              <Download className="w-4 h-4" aria-hidden />
+              {download.isPending ? 'Descargando…' : 'Descargar CSV'}
             </button>
           </div>
 
-          {result.rows.length === 0 ? (
+          {result.isEmpty ? (
             <div className="px-5 py-12 text-center">
               <FileBarChart
                 className="w-8 h-8 text-[#8a807c] mx-auto mb-2"
@@ -189,8 +178,11 @@ export function AdminReportsScreen() {
                   </tr>
                 </thead>
                 <tbody>
-                  {result.rows.map((row, i) => (
-                    <tr key={i} className="border-t border-[#f0ebe8]">
+                  {result.rows.map((row) => (
+                    <tr
+                      key={String(row[0])}
+                      className="border-t border-[#f0ebe8]"
+                    >
                       {row.map((cell, j) => (
                         <td key={j} className="px-4 py-3 text-[#4a4340]">
                           {cell}

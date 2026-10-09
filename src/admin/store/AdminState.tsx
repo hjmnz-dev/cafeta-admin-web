@@ -114,9 +114,6 @@ interface AdminStateValue {
   posts: AdminPost[];
   reports: AdminReport[];
   audit: AuditEntry[];
-
-  /** HU44 — Registrar en bitácora la generación de un reporte administrativo. */
-  logReportGenerated: (detail: string) => void;
 }
 
 const CAREERS = [
@@ -410,9 +407,6 @@ function load(): PersistedState {
   };
 }
 
-let auditSeq = 0;
-const nextAuditId = () => `audit-${Date.now()}-${++auditSeq}`;
-
 const AdminStateContext = createContext<AdminStateValue | null>(null);
 
 export function AdminStateProvider({
@@ -422,7 +416,7 @@ export function AdminStateProvider({
   actor: Actor;
   children: React.ReactNode;
 }) {
-  const [{ users, posts, reports, audit }, setState] = useState(load);
+  const [{ users, posts, reports, audit }] = useState(load);
 
   useEffect(() => {
     try {
@@ -435,43 +429,6 @@ export function AdminStateProvider({
     }
   }, [users, posts, reports, audit]);
 
-  /** Añade una entrada a la bitácora. Toda acción pasa por aquí (HU46). */
-  const record = (
-    s: PersistedState,
-    action: AuditAction,
-    target: string,
-    detail: string,
-    succeeded = true,
-  ): PersistedState => ({
-    ...s,
-    audit: [
-      {
-        id: nextAuditId(),
-        at: Date.now(),
-        actor: actor.name,
-        actorRole: 'admin',
-        action,
-        target,
-        detail,
-        succeeded,
-      },
-      ...s.audit,
-    ],
-  });
-
-  /** Estado actual como una sola pieza, para decidir y registrar sobre él. */
-  const snapshot = (): PersistedState => ({
-    users,
-    posts,
-    reports,
-    audit,
-  });
-
-  const logReportGenerated = (detail: string) =>
-    setState(
-      record(snapshot(), 'report.generate', 'Reportes administrativos', detail),
-    );
-
   return (
     <AdminStateContext.Provider
       value={{
@@ -480,7 +437,6 @@ export function AdminStateProvider({
         posts,
         reports,
         audit,
-        logReportGenerated,
       }}
     >
       {children}

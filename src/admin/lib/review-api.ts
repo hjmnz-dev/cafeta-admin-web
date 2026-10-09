@@ -18,7 +18,7 @@ export const PENDING_QUEUE: ReviewFilters = {
 
 const PAGE_SIZE = 20;
 
-/** Cadena de consulta de GET /admin/reports para unos filtros y un cursor. */
+/** Cadena de consulta de GET /admin/community-reports para unos filtros y un cursor. */
 export function reviewQuery(filters: ReviewFilters, cursor?: string): string {
   const params = new URLSearchParams({
     status: filters.status,
@@ -33,12 +33,12 @@ export function reviewQuery(filters: ReviewFilters, cursor?: string): string {
 export const reviewApi = {
   list: (filters: ReviewFilters, cursor?: string) =>
     apiRequest<components['schemas']['AdminReportPageDto']>(
-      `/admin/reports?${reviewQuery(filters, cursor)}`,
+      `/admin/community-reports?${reviewQuery(filters, cursor)}`,
     ),
   detail: (id: string) =>
-    apiRequest<ReviewReportDetail>(`/admin/reports/${id}`),
+    apiRequest<ReviewReportDetail>(`/admin/community-reports/${id}`),
   resolve: (id: string, action: ResolveAction, note?: string) =>
-    apiRequest<void>(`/admin/reports/${id}/resolve`, {
+    apiRequest<void>(`/admin/community-reports/${id}/resolve`, {
       method: 'POST',
       body: note ? { action, note } : { action },
     }),
