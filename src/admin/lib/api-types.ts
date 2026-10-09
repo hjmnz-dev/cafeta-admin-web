@@ -713,6 +713,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/reports/{kind}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Genera un informe (actividad o moderación) para ver en pantalla */
+    get: operations['AdminReportsController_generate'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/reports/{kind}/csv': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Descarga el informe en CSV (UTF 8 con BOM, abre bien en Excel) */
+    get: operations['AdminReportsController_download'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/admin/users': {
     parameters: {
       query?: never;
@@ -781,7 +815,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/admin/reports': {
+  '/api/v1/admin/community-reports': {
     parameters: {
       query?: never;
       header?: never;
@@ -789,7 +823,7 @@ export interface paths {
       cookie?: never;
     };
     /** Cola de reportes con filtros (solo admin) */
-    get: operations['AdminReportsController_list'];
+    get: operations['ReportReviewController_list'];
     put?: never;
     post?: never;
     delete?: never;
@@ -798,7 +832,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/admin/reports/{id}': {
+  '/api/v1/admin/community-reports/{id}': {
     parameters: {
       query?: never;
       header?: never;
@@ -806,7 +840,7 @@ export interface paths {
       cookie?: never;
     };
     /** Detalle de un reporte y sus pendientes hermanos */
-    get: operations['AdminReportsController_detail'];
+    get: operations['ReportReviewController_detail'];
     put?: never;
     post?: never;
     delete?: never;
@@ -815,7 +849,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/admin/reports/{id}/resolve': {
+  '/api/v1/admin/community-reports/{id}/resolve': {
     parameters: {
       query?: never;
       header?: never;
@@ -825,7 +859,7 @@ export interface paths {
     get?: never;
     put?: never;
     /** Desestimar el reporte o sancionar al objetivo */
-    post: operations['AdminReportsController_resolve'];
+    post: operations['ReportReviewController_resolve'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1310,6 +1344,21 @@ export interface components {
     AuditActionsDto: {
       /** @description El catálogo de acciones auditables, para llenar un selector. */
       actions: string[];
+    };
+    ReportTableDto: {
+      /** @enum {string} */
+      kind: 'activity' | 'moderation';
+      rows: (string | number)[][];
+      /** @description Nombre del informe. */
+      title: string;
+      /** @description Primer día del rango, YYYY-MM-DD. */
+      from: string;
+      /** @description Último día del rango, YYYY-MM-DD, inclusive. */
+      to: string;
+      /** @description Encabezados, en el mismo orden que las celdas de cada fila. */
+      columns: string[];
+      /** @description No hubo actividad registrada en el rango. */
+      isEmpty: boolean;
     };
     /** @enum {string} */
     VerificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
@@ -2649,6 +2698,101 @@ export interface operations {
       };
     };
   };
+  AdminReportsController_generate: {
+    parameters: {
+      query: {
+        /** @description Primer día del rango. */
+        from: string;
+        /** @description Último día del rango, inclusive. */
+        to: string;
+      };
+      header?: never;
+      path: {
+        kind: 'activity' | 'moderation';
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReportTableDto'];
+        };
+      };
+      /** @description INVALID_DATE_RANGE, RANGE_TOO_LARGE o VALIDATION_ERROR */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Sin sesión */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description La cuenta no es admin: FORBIDDEN */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminReportsController_download: {
+    parameters: {
+      query: {
+        /** @description Primer día del rango. */
+        from: string;
+        /** @description Último día del rango, inclusive. */
+        to: string;
+      };
+      header?: never;
+      path: {
+        kind: 'activity' | 'moderation';
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo CSV */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/csv': string;
+        };
+      };
+      /** @description INVALID_DATE_RANGE, RANGE_TOO_LARGE o VALIDATION_ERROR */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Sin sesión */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description La cuenta no es admin: FORBIDDEN */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   AdminUsersController_list: {
     parameters: {
       query: {
@@ -2797,7 +2941,7 @@ export interface operations {
       };
     };
   };
-  AdminReportsController_list: {
+  ReportReviewController_list: {
     parameters: {
       query: {
         /** @description id de la última publicación de la página anterior. */
@@ -2832,7 +2976,7 @@ export interface operations {
       };
     };
   };
-  AdminReportsController_detail: {
+  ReportReviewController_detail: {
     parameters: {
       query?: never;
       header?: never;
@@ -2867,7 +3011,7 @@ export interface operations {
       };
     };
   };
-  AdminReportsController_resolve: {
+  ReportReviewController_resolve: {
     parameters: {
       query?: never;
       header?: never;

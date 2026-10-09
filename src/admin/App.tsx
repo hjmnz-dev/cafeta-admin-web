@@ -5,7 +5,6 @@ import { router } from './routes';
 import { LoginScreen } from './components/LoginScreen';
 import { QueryProvider } from './store/QueryProvider';
 import { SessionProvider, useSession } from './store/SessionStore';
-import { AdminStateProvider } from './store/AdminState';
 
 // Errores fuera del router (providers): la misma pantalla, con el código del
 // evento solo si el monitoreo está activo (spec 0007).
@@ -33,13 +32,7 @@ function Console() {
     );
   }
   if (!user) return <LoginScreen />;
-  return (
-    <AdminStateProvider
-      actor={{ name: user.profile.displayName, email: user.email }}
-    >
-      <RouterProvider router={router} />
-    </AdminStateProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default function App() {
