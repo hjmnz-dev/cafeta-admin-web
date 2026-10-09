@@ -713,6 +713,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/announcements': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Todos los anuncios, activos y desactivados (solo admin) */
+    get: operations['AnnouncementsController_list'];
+    put?: never;
+    /** Publicar un anuncio oficial (solo admin) */
+    post: operations['AnnouncementsController_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/admin/users': {
     parameters: {
       query?: never;
@@ -1310,6 +1328,33 @@ export interface components {
     AuditActionsDto: {
       /** @description El catálogo de acciones auditables, para llenar un selector. */
       actions: string[];
+    };
+    CreateAnnouncementDto: {
+      /** @description Texto del anuncio, de 1 a 2000 caracteres. */
+      content: string;
+      /** @description Claves que devolvió POST /uploads: hasta 4 imágenes, o 1 video, o 1 PDF. */
+      mediaKeys?: string[];
+    };
+    AdminAnnouncementViewDto: {
+      content: string | null;
+      editedAt: string | null;
+      deactivatedAt: string | null;
+      archivedAt: string | null;
+      id: string;
+      /** @description Fecha de publicación en ISO 8601. */
+      createdAt: string;
+      /** @description false si está desactivado o archivado: ya no sale en el feed. */
+      active: boolean;
+      /** @description Quién lo publicó (el admin autor). */
+      publishedBy: string;
+      media: components['schemas']['PostMediaDto'][];
+      reactionCount: number;
+      commentCount: number;
+    };
+    AdminAnnouncementPageDto: {
+      /** @description id para pedir la página siguiente; null si no hay más. */
+      nextCursor: string | null;
+      items: components['schemas']['AdminAnnouncementViewDto'][];
     };
     /** @enum {string} */
     VerificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
@@ -2639,6 +2684,74 @@ export interface operations {
         content: {
           'application/json': components['schemas']['AuditActionsDto'];
         };
+      };
+      /** @description No es admin: FORBIDDEN */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AnnouncementsController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminAnnouncementPageDto'];
+        };
+      };
+      /** @description No es admin: FORBIDDEN */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AnnouncementsController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAnnouncementDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PostViewDto'];
+        };
+      };
+      /** @description Texto vacío (POST_CONTENT_REQUIRED), adjunto ajeno (MEDIA_NOT_FOUND) o combinación inválida (MEDIA_COMBINATION_INVALID) */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description No es admin: FORBIDDEN */
       403: {

@@ -5,6 +5,7 @@ import {
   Flag,
   ScrollText,
   FileBarChart,
+  Megaphone,
   ShieldCheck,
   LogOut,
 } from 'lucide-react';
@@ -27,6 +28,7 @@ const NAV = [
     icon: Flag,
     end: false,
   },
+  { to: '/anuncios', label: 'Anuncios', icon: Megaphone, end: false },
   {
     to: '/bitacora',
     label: 'Bitácora de auditoría',
