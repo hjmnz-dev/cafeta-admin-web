@@ -713,34 +713,18 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/admin/reports/{kind}': {
+  '/api/v1/admin/announcements': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Genera un informe (actividad o moderación) para ver en pantalla */
-    get: operations['AdminReportsController_generate'];
+    /** Todos los anuncios, activos y desactivados (solo admin) */
+    get: operations['AnnouncementsController_list'];
     put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/admin/reports/{kind}/csv': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Descarga el informe en CSV (UTF 8 con BOM, abre bien en Excel) */
-    get: operations['AdminReportsController_download'];
-    put?: never;
-    post?: never;
+    /** Publicar un anuncio oficial (solo admin) */
+    post: operations['AnnouncementsController_create'];
     delete?: never;
     options?: never;
     head?: never;
@@ -809,6 +793,40 @@ export interface paths {
     put?: never;
     /** Verificar o rechazar una cuenta pendiente */
     post: operations['AdminUsersController_decide'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/reports/{kind}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Genera un informe (actividad o moderación) para ver en pantalla */
+    get: operations['AdminReportsController_generate'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/reports/{kind}/csv': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Descarga el informe en CSV (UTF 8 con BOM, abre bien en Excel) */
+    get: operations['AdminReportsController_download'];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -1345,20 +1363,32 @@ export interface components {
       /** @description El catálogo de acciones auditables, para llenar un selector. */
       actions: string[];
     };
-    ReportTableDto: {
-      /** @enum {string} */
-      kind: 'activity' | 'moderation';
-      rows: (string | number)[][];
-      /** @description Nombre del informe. */
-      title: string;
-      /** @description Primer día del rango, YYYY-MM-DD. */
-      from: string;
-      /** @description Último día del rango, YYYY-MM-DD, inclusive. */
-      to: string;
-      /** @description Encabezados, en el mismo orden que las celdas de cada fila. */
-      columns: string[];
-      /** @description No hubo actividad registrada en el rango. */
-      isEmpty: boolean;
+    CreateAnnouncementDto: {
+      /** @description Texto del anuncio, de 1 a 2000 caracteres. */
+      content: string;
+      /** @description Claves que devolvió POST /uploads: hasta 4 imágenes, o 1 video, o 1 PDF. */
+      mediaKeys?: string[];
+    };
+    AdminAnnouncementViewDto: {
+      content: string | null;
+      editedAt: string | null;
+      deactivatedAt: string | null;
+      archivedAt: string | null;
+      id: string;
+      /** @description Fecha de publicación en ISO 8601. */
+      createdAt: string;
+      /** @description false si está desactivado o archivado: ya no sale en el feed. */
+      active: boolean;
+      /** @description Quién lo publicó (el admin autor). */
+      publishedBy: string;
+      media: components['schemas']['PostMediaDto'][];
+      reactionCount: number;
+      commentCount: number;
+    };
+    AdminAnnouncementPageDto: {
+      /** @description id para pedir la página siguiente; null si no hay más. */
+      nextCursor: string | null;
+      items: components['schemas']['AdminAnnouncementViewDto'][];
     };
     /** @enum {string} */
     VerificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
@@ -1394,6 +1424,21 @@ export interface components {
        * @enum {string}
        */
       decision: 'VERIFIED' | 'REJECTED';
+    };
+    ReportTableDto: {
+      /** @enum {string} */
+      kind: 'activity' | 'moderation';
+      rows: (string | number)[][];
+      /** @description Nombre del informe. */
+      title: string;
+      /** @description Primer día del rango, YYYY-MM-DD. */
+      from: string;
+      /** @description Último día del rango, YYYY-MM-DD, inclusive. */
+      to: string;
+      /** @description Encabezados, en el mismo orden que las celdas de cada fila. */
+      columns: string[];
+      /** @description No hubo actividad registrada en el rango. */
+      isEmpty: boolean;
     };
     /** @enum {string} */
     ReportTarget: 'USER' | 'POST';
@@ -2698,18 +2743,16 @@ export interface operations {
       };
     };
   };
-  AdminReportsController_generate: {
+  AnnouncementsController_list: {
     parameters: {
       query: {
-        /** @description Primer día del rango. */
-        from: string;
-        /** @description Último día del rango, inclusive. */
-        to: string;
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
       };
       header?: never;
-      path: {
-        kind: 'activity' | 'moderation';
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -2719,24 +2762,10 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ReportTableDto'];
+          'application/json': components['schemas']['AdminAnnouncementPageDto'];
         };
       };
-      /** @description INVALID_DATE_RANGE, RANGE_TOO_LARGE o VALIDATION_ERROR */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Sin sesión */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description La cuenta no es admin: FORBIDDEN */
+      /** @description No es admin: FORBIDDEN */
       403: {
         headers: {
           [name: string]: unknown;
@@ -2745,46 +2774,35 @@ export interface operations {
       };
     };
   };
-  AdminReportsController_download: {
+  AnnouncementsController_create: {
     parameters: {
-      query: {
-        /** @description Primer día del rango. */
-        from: string;
-        /** @description Último día del rango, inclusive. */
-        to: string;
-      };
+      query?: never;
       header?: never;
-      path: {
-        kind: 'activity' | 'moderation';
-      };
+      path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAnnouncementDto'];
+      };
+    };
     responses: {
-      /** @description Archivo CSV */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'text/csv': string;
+          'application/json': components['schemas']['PostViewDto'];
         };
       };
-      /** @description INVALID_DATE_RANGE, RANGE_TOO_LARGE o VALIDATION_ERROR */
+      /** @description Texto vacío (POST_CONTENT_REQUIRED), adjunto ajeno (MEDIA_NOT_FOUND) o combinación inválida (MEDIA_COMBINATION_INVALID) */
       400: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Sin sesión */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description La cuenta no es admin: FORBIDDEN */
+      /** @description No es admin: FORBIDDEN */
       403: {
         headers: {
           [name: string]: unknown;
@@ -2934,6 +2952,101 @@ export interface operations {
       };
       /** @description Ya tenía decisión: VERIFICATION_ALREADY_DECIDED */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminReportsController_generate: {
+    parameters: {
+      query: {
+        /** @description Primer día del rango. */
+        from: string;
+        /** @description Último día del rango, inclusive. */
+        to: string;
+      };
+      header?: never;
+      path: {
+        kind: 'activity' | 'moderation';
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReportTableDto'];
+        };
+      };
+      /** @description INVALID_DATE_RANGE, RANGE_TOO_LARGE o VALIDATION_ERROR */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Sin sesión */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description La cuenta no es admin: FORBIDDEN */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminReportsController_download: {
+    parameters: {
+      query: {
+        /** @description Primer día del rango. */
+        from: string;
+        /** @description Último día del rango, inclusive. */
+        to: string;
+      };
+      header?: never;
+      path: {
+        kind: 'activity' | 'moderation';
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Archivo CSV */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/csv': string;
+        };
+      };
+      /** @description INVALID_DATE_RANGE, RANGE_TOO_LARGE o VALIDATION_ERROR */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Sin sesión */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description La cuenta no es admin: FORBIDDEN */
+      403: {
         headers: {
           [name: string]: unknown;
         };

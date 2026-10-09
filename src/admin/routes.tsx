@@ -5,6 +5,7 @@ import { RequireAdmin } from './components/RequireAdmin';
 import { DashboardScreen } from './components/DashboardScreen';
 import { UsersScreen } from './components/UsersScreen';
 import { ReportsReviewScreen } from './components/ReportsReviewScreen';
+import { AnnouncementsScreen } from './components/AnnouncementsScreen';
 import { AuditLogScreen } from './components/AuditLogScreen';
 import { AdminReportsScreen } from './components/AdminReportsScreen';
 import {
@@ -39,6 +40,13 @@ export const router = createBrowserRouter([
         element: guarded(
           'los reportes de la comunidad',
           <ReportsReviewScreen />,
+        ),
+      },
+      {
+        path: 'anuncios',
+        element: guarded(
+          'los anuncios institucionales',
+          <AnnouncementsScreen />,
         ),
       },
       {

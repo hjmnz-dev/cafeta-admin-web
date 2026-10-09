@@ -110,7 +110,10 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const session = readStoredSession();
   const headers: Record<string, string> = {};
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  // Un FormData lo arma el navegador con su propio Content-Type y límites.
+  const isForm = body instanceof FormData;
+  if (body !== undefined && !isForm)
+    headers['Content-Type'] = 'application/json';
   if (session) headers.Authorization = `Bearer ${session.accessToken}`;
 
   let res: Response;
@@ -118,7 +121,10 @@ export async function apiRequest<T>(
     res = await fetch(`${API_URL}${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body:
+        body === undefined || isForm
+          ? (body as FormData | undefined)
+          : JSON.stringify(body),
     });
   } catch {
     throw new ApiError(0, 'NETWORK_ERROR', messageForCode('NETWORK_ERROR'));

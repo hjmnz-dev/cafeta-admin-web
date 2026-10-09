@@ -25,6 +25,13 @@ const MESSAGES: Readonly<Record<string, string>> = {
   ALREADY_ACTIVE: 'La cuenta ya estaba activa.',
   VERIFICATION_ALREADY_DECIDED:
     'Esta cuenta ya tiene una decisión de verificación.',
+  POST_CONTENT_REQUIRED: 'Escribe el texto del anuncio.',
+  UNSUPPORTED_MEDIA_TYPE:
+    'Ese formato no se puede subir. Usa imágenes JPG, PNG, WebP o GIF, video MP4 o WebM, o un PDF.',
+  FILE_TOO_LARGE:
+    'El archivo es muy grande. Imágenes hasta 5 MB, video hasta 25 MB y PDF hasta 10 MB.',
+  MEDIA_NOT_FOUND: 'Uno de los archivos ya no está. Quítalo y súbelo de nuevo.',
+  MEDIA_COMBINATION_INVALID: 'Adjunta hasta 4 imágenes, o 1 video, o 1 PDF.',
   CANNOT_ACT_ON_SELF: 'No puedes actuar sobre tu propia cuenta.',
   CANNOT_SANCTION_ADMIN: 'No se puede desactivar a otro administrador.',
 };
