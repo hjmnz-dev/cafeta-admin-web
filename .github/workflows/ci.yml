@@ -49,8 +49,10 @@ jobs:
       - run: npm ci
       # El monitoreo (spec 0007) queda fijo en el build; sin él, no se publica.
       # El build sube los source maps a Sentry y los borra.
-      - run: test -n "$VITE_SENTRY_DSN" && test -n "$SENTRY_AUTH_TOKEN" && npm run build
+      # La URL de la API también queda fija en el build; sin ella la consola apunta a localhost.
+      - run: test -n "$VITE_API_URL" && test -n "$VITE_SENTRY_DSN" && test -n "$SENTRY_AUTH_TOKEN" && npm run build
         env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
           VITE_APP_VERSION: ${{ github.sha }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
