@@ -8,7 +8,7 @@ import {
   ShieldCheck,
   LogOut,
 } from 'lucide-react';
-import { useAdminState } from '../store/AdminState';
+import { useDashboardMetrics } from '../store/dashboard-queries';
 import { useSession } from '../store/SessionStore';
 
 /**
@@ -67,8 +67,8 @@ function SessionBadge() {
 }
 
 export function AdminLayout() {
-  const { reports } = useAdminState();
-  const pending = reports.filter((r) => r.status === 'pending').length;
+  // El contador es el real de la API (el mismo del dashboard, en caché).
+  const pending = useDashboardMetrics().data?.pendingReports ?? 0;
 
   return (
     <div className="min-h-screen flex bg-[#efebe8]">
