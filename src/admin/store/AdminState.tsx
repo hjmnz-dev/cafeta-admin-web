@@ -120,8 +120,6 @@ interface AdminStateValue {
   /** HU51/HU52 — Resolver una denuncia: sancionar o desestimar. */
   sanctionReport: (reportId: string) => boolean;
   dismissReport: (reportId: string) => boolean;
-  /** HU44 — Registrar en bitácora la generación de un reporte administrativo. */
-  logReportGenerated: (detail: string) => void;
 }
 
 const CAREERS = [
@@ -588,11 +586,6 @@ export function AdminStateProvider({
       };
     });
 
-  const logReportGenerated = (detail: string) =>
-    setState(
-      record(snapshot(), 'report.generate', 'Reportes administrativos', detail),
-    );
-
   return (
     <AdminStateContext.Provider
       value={{
@@ -604,7 +597,6 @@ export function AdminStateProvider({
         deactivatePost,
         sanctionReport,
         dismissReport,
-        logReportGenerated,
       }}
     >
       {children}
