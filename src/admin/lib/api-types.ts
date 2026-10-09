@@ -713,6 +713,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lista de usuarios con filtros (solo admin) */
+    get: operations['AdminUsersController_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/users/{id}/deactivate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Desactivar una cuenta y cerrar sus sesiones */
+    post: operations['AdminUsersController_deactivate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/users/{id}/reactivate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reactivar una cuenta con su historial */
+    post: operations['AdminUsersController_reactivate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/users/{id}/verification': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Verificar o rechazar una cuenta pendiente */
+    post: operations['AdminUsersController_decide'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1164,6 +1232,43 @@ export interface components {
       columns: string[];
       /** @description No hubo actividad registrada en el rango. */
       isEmpty: boolean;
+    };
+    /** @enum {string} */
+    Role: 'STUDENT' | 'ADMIN';
+    /** @enum {string} */
+    VerificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
+    AdminUserViewDto: {
+      /** @description Nombre de la carrera; null si no tiene. */
+      career: string | null;
+      role: components['schemas']['Role'];
+      /** @description Cuándo se desactivó, en ISO 8601; null si está activa. */
+      deactivatedAt: string | null;
+      verificationStatus: components['schemas']['VerificationStatus'];
+      id: string;
+      /** @example ana@est.intec.edu.do */
+      email: string;
+      /** @example ana_intec */
+      handle: string;
+      displayName: string;
+      /** @description false si la cuenta está desactivada. */
+      active: boolean;
+      /** @description Fecha de registro en ISO 8601. */
+      createdAt: string;
+    };
+    AdminUserPageDto: {
+      /** @description id para pedir la página siguiente; null si no hay más. */
+      nextCursor: string | null;
+      items: components['schemas']['AdminUserViewDto'][];
+    };
+    AdminReasonDto: {
+      reason: string;
+    };
+    VerificationDecisionDto: {
+      /**
+       * @description VERIFIED aprueba la cuenta institucional; REJECTED la rechaza.
+       * @enum {string}
+       */
+      decision: 'VERIFIED' | 'REJECTED';
     };
   };
   responses: never;
@@ -2344,6 +2449,154 @@ export interface operations {
       };
       /** @description La cuenta no es admin: FORBIDDEN */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminUsersController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+        /** @description Texto en el correo, el usuario o el nombre; ignora mayúsculas. */
+        search?: string;
+        /** @description `active` (sin baja) o `inactive` (desactivadas). */
+        status?: 'active' | 'inactive';
+        verification?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+        role?: 'STUDENT' | 'ADMIN';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminUserPageDto'];
+        };
+      };
+      /** @description No es admin (FORBIDDEN), o intenta actuar sobre sí mismo (CANNOT_ACT_ON_SELF) o sancionar a otro admin (CANNOT_SANCTION_ADMIN) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminUsersController_deactivate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AdminReasonDto'];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No es admin (FORBIDDEN), o intenta actuar sobre sí mismo (CANNOT_ACT_ON_SELF) o sancionar a otro admin (CANNOT_SANCTION_ADMIN) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Ya estaba desactivada: ALREADY_INACTIVE */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminUsersController_reactivate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AdminReasonDto'];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No es admin (FORBIDDEN), o intenta actuar sobre sí mismo (CANNOT_ACT_ON_SELF) o sancionar a otro admin (CANNOT_SANCTION_ADMIN) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Ya estaba activa: ALREADY_ACTIVE */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminUsersController_decide: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VerificationDecisionDto'];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No es admin (FORBIDDEN), o intenta actuar sobre sí mismo (CANNOT_ACT_ON_SELF) o sancionar a otro admin (CANNOT_SANCTION_ADMIN) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Ya tenía decisión: VERIFICATION_ALREADY_DECIDED */
+      409: {
         headers: {
           [name: string]: unknown;
         };

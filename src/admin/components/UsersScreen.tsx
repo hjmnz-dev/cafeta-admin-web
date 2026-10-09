@@ -1,102 +1,119 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Search, UserX, UserCheck, BadgeCheck, BadgeX } from 'lucide-react';
-import { useAdminState, AdminUser } from '../store/AdminState';
+import { userMessageOf } from '../lib/http';
 import { formatDate } from '../lib/format';
+import { hasActions, userActions, type UserActionKind } from '../lib/users';
+import {
+  NO_FILTERS,
+  type AdminUserView,
+  type UserFilters,
+  type VerificationDecision,
+} from '../lib/users-api';
+import { useSession } from '../store/SessionStore';
+import { useDebouncedValue } from '../store/useDebouncedValue';
+import {
+  useAdminUsers,
+  useDeactivateUser,
+  useDecideVerification,
+  useReactivateUser,
+} from '../store/users-queries';
+import { StatusPill, VerificationPill } from './UserPills';
+import { UserActionDialog } from './UserActionDialog';
 
 /**
  * HU47-HU50 — Listado de cuentas y acciones administrativas sobre ellas.
  *
- * El listado es el punto de partida de la gestión de cuentas, así que muestra
- * de un vistazo lo que decide una acción: estado, verificación y antigüedad.
- * Cada acción confirma antes de ejecutarse y explica en pantalla lo ocurrido,
- * incluido cuando no procedía (p. ej. reactivar una cuenta ya activa, HU49).
+ * Los datos son los reales de la API. El listado muestra de un vistazo lo que
+ * decide una acción: estado, verificación y antigüedad. Desactivar y reactivar
+ * confirman y piden el motivo; verificar o rechazar se decide una sola vez por
+ * cuenta. Cuando una acción no procedía (p. ej. reactivar una cuenta ya
+ * activa, HU49) la pantalla lo explica y la fila se corrige sola.
  */
 
-type StatusFilter = 'all' | 'active' | 'inactive' | 'pending';
+type Chip = 'all' | 'active' | 'inactive' | 'pending';
 
-const FILTERS: { value: StatusFilter; label: string }[] = [
-  { value: 'all', label: 'Todas' },
-  { value: 'active', label: 'Activas' },
-  { value: 'inactive', label: 'Inactivas' },
-  { value: 'pending', label: 'Verificación pendiente' },
+const CHIPS: { value: Chip; label: string; filters: Partial<UserFilters> }[] = [
+  { value: 'all', label: 'Todas', filters: {} },
+  { value: 'active', label: 'Activas', filters: { status: 'active' } },
+  { value: 'inactive', label: 'Inactivas', filters: { status: 'inactive' } },
+  {
+    value: 'pending',
+    label: 'Verificación pendiente',
+    filters: { verification: 'PENDING' },
+  },
 ];
 
-function StatusPill({ user }: { user: AdminUser }) {
-  const active = user.status === 'active';
-  return (
-    <span
-      className={
-        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold ' +
-        (active ? 'bg-[#e8f3ec] text-[#2f7d4f]' : 'bg-[#f1ece9] text-[#8a807c]')
-      }
-    >
-      <span
-        className={
-          'w-1.5 h-1.5 rounded-full ' +
-          (active ? 'bg-[#2f7d4f]' : 'bg-[#8a807c]')
-        }
-      />
-      {active ? 'Activa' : 'Inactiva'}
-    </span>
-  );
-}
+const SEARCH_DELAY_MS = 300;
 
-function VerificationPill({ user }: { user: AdminUser }) {
-  const map = {
-    verified: { label: 'Verificada', className: 'bg-[#ffe9e6] text-[#d62828]' },
-    pending: { label: 'Pendiente', className: 'bg-[#fdf3e2] text-[#b7791f]' },
-    rejected: { label: 'Rechazada', className: 'bg-[#f1ece9] text-[#8a807c]' },
-  }[user.verification];
+type Notice = { tone: 'ok' | 'warn'; text: string };
 
-  return (
-    <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold ${map.className}`}
-    >
-      {map.label}
-    </span>
-  );
-}
+const ACTION_BUTTON =
+  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors disabled:opacity-50';
 
 export function UsersScreen() {
-  const {
-    users,
-    deactivateAccount,
-    reactivateAccount,
-    verifyAccount,
-    rejectVerification,
-  } = useAdminState();
+  const { user: session } = useSession();
+  const selfId = session?.id ?? null;
 
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<StatusFilter>('all');
-  const [notice, setNotice] = useState<{
-    tone: 'ok' | 'warn';
-    text: string;
-  } | null>(null);
+  const [chip, setChip] = useState<Chip>('all');
+  const [notice, setNotice] = useState<Notice | null>(null);
   const [confirming, setConfirming] = useState<{
-    user: AdminUser;
-    kind: 'deactivate' | 'reactivate';
+    user: AdminUserView;
+    kind: UserActionKind;
   } | null>(null);
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return users.filter((u) => {
-      const matchesQuery =
-        !q ||
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q);
-      const matchesFilter =
-        filter === 'all' ||
-        (filter === 'pending'
-          ? u.verification === 'pending'
-          : u.status === filter);
-      return matchesQuery && matchesFilter;
-    });
-  }, [users, query, filter]);
+  const search = useDebouncedValue(query, SEARCH_DELAY_MS);
+  const filters: UserFilters = {
+    ...NO_FILTERS,
+    search,
+    ...CHIPS.find((c) => c.value === chip)?.filters,
+  };
 
-  /** Ejecuta la acción y traduce su resultado a un aviso en pantalla. */
-  const run = (ok: boolean, okText: string, failText: string) =>
-    setNotice(
-      ok ? { tone: 'ok', text: okText } : { tone: 'warn', text: failText },
+  const users = useAdminUsers(filters);
+  const deactivate = useDeactivateUser();
+  const reactivate = useReactivateUser();
+  const decide = useDecideVerification();
+
+  const rows = users.data?.pages.flatMap((page) => page.items) ?? [];
+
+  const report = (text: string) => setNotice({ tone: 'ok', text });
+  const fail = (error: unknown) =>
+    setNotice({ tone: 'warn', text: userMessageOf(error) });
+
+  const confirmAction = (reason: string) => {
+    if (!confirming) return;
+    const { user, kind } = confirming;
+    const mutation = kind === 'deactivate' ? deactivate : reactivate;
+    mutation.mutate(
+      { id: user.id, reason },
+      {
+        onSuccess: () =>
+          report(
+            kind === 'deactivate'
+              ? `Cuenta de ${user.displayName} desactivada.`
+              : `Cuenta de ${user.displayName} reactivada.`,
+          ),
+        onError: fail,
+        onSettled: () => setConfirming(null),
+      },
+    );
+  };
+
+  const decideVerification = (
+    user: AdminUserView,
+    decision: VerificationDecision,
+  ) =>
+    decide.mutate(
+      { id: user.id, decision },
+      {
+        onSuccess: () =>
+          report(
+            decision === 'VERIFIED'
+              ? `Cuenta de ${user.displayName} verificada como institucional.`
+              : `Verificación de ${user.displayName} rechazada; la cuenta sigue sin verificar.`,
+          ),
+        onError: fail,
+      },
     );
 
   return (
@@ -106,8 +123,7 @@ export function UsersScreen() {
           Usuarios
         </h1>
         <p className="text-[14px] text-[#8a807c]">
-          {users.length} cuentas registradas · gestión de estado y verificación
-          institucional.
+          Gestión de estado y verificación institucional.
         </p>
       </header>
 
@@ -125,7 +141,7 @@ export function UsersScreen() {
         </p>
       )}
 
-      {/* Búsqueda dentro del listado (HU47, escenario 2) */}
+      {/* Búsqueda y filtros del listado (HU47, escenario 2) */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[260px]">
           <Search
@@ -134,31 +150,46 @@ export function UsersScreen() {
           />
           <input
             type="search"
-            aria-label="Buscar por nombre o correo"
-            placeholder="Buscar por nombre o correo..."
+            aria-label="Buscar por nombre, usuario o correo"
+            placeholder="Buscar por nombre, usuario o correo..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-2.5 rounded-[14px] border border-[#e3ddd9] bg-white text-[14px] outline-none focus:border-[#d62828]"
           />
         </div>
         <div className="flex gap-2" role="group" aria-label="Filtrar cuentas">
-          {FILTERS.map((f) => (
+          {CHIPS.map((c) => (
             <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              aria-pressed={filter === f.value}
+              key={c.value}
+              onClick={() => setChip(c.value)}
+              aria-pressed={chip === c.value}
               className={
                 'px-3.5 py-2 rounded-full text-[13px] font-semibold border transition-colors ' +
-                (filter === f.value
+                (chip === c.value
                   ? 'bg-[#d62828] text-white border-[#d62828]'
                   : 'bg-white text-[#4a4340] border-[#e3ddd9] hover:border-[#d62828]')
               }
             >
-              {f.label}
+              {c.label}
             </button>
           ))}
         </div>
       </div>
+
+      {users.isError && (
+        <p
+          role="alert"
+          className="mb-4 px-4 py-3 rounded-[14px] text-[14px] border bg-[#fdf3e2] border-[#efdcb8] text-[#b7791f]"
+        >
+          {userMessageOf(users.error)}{' '}
+          <button
+            className="underline font-semibold"
+            onClick={() => users.refetch()}
+          >
+            Reintentar
+          </button>
+        </p>
+      )}
 
       <div className="bg-white border border-[#e3ddd9] rounded-[18px] overflow-hidden">
         <div className="overflow-x-auto">
@@ -189,7 +220,17 @@ export function UsersScreen() {
               </tr>
             </thead>
             <tbody>
-              {results.length === 0 && (
+              {users.isPending && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-4 py-10 text-center text-[#8a807c]"
+                  >
+                    Cargando cuentas…
+                  </td>
+                </tr>
+              )}
+              {users.isSuccess && rows.length === 0 && (
                 <tr>
                   <td
                     colSpan={6}
@@ -200,141 +241,118 @@ export function UsersScreen() {
                 </tr>
               )}
 
-              {results.map((u) => (
-                <tr
-                  key={u.id}
-                  className="border-t border-[#f0ebe8] align-middle"
-                >
-                  <td className="px-4 py-3">
-                    <p className="font-semibold text-[#171313]">{u.name}</p>
-                    <p className="text-[13px] text-[#8a807c]">{u.email}</p>
-                  </td>
-                  <td className="px-4 py-3 text-[#4a4340]">{u.career}</td>
-                  <td className="px-4 py-3 text-[#4a4340] whitespace-nowrap">
-                    {formatDate(u.joinedAt)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusPill user={u} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <VerificationPill user={u} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-2 flex-wrap">
-                      {u.verification !== 'verified' && (
-                        <button
-                          onClick={() =>
-                            run(
-                              verifyAccount(u.id),
-                              `Cuenta de ${u.name} verificada como institucional.`,
-                              `No se pudo verificar la cuenta de ${u.name}.`,
-                            )
-                          }
-                          aria-label={`Verificar cuenta de ${u.name}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors"
-                        >
-                          <BadgeCheck className="w-4 h-4" aria-hidden />{' '}
-                          Verificar
-                        </button>
-                      )}
-                      {u.verification === 'pending' && (
-                        <button
-                          onClick={() =>
-                            run(
-                              rejectVerification(u.id),
-                              `Verificación de ${u.name} rechazada; la cuenta sigue sin verificar.`,
-                              `No se pudo rechazar la verificación de ${u.name}.`,
-                            )
-                          }
-                          aria-label={`Rechazar verificación de ${u.name}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors"
-                        >
-                          <BadgeX className="w-4 h-4" aria-hidden /> Rechazar
-                        </button>
-                      )}
-                      {u.status === 'active' ? (
-                        <button
-                          onClick={() =>
-                            setConfirming({ user: u, kind: 'deactivate' })
-                          }
-                          aria-label={`Desactivar cuenta de ${u.name}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold bg-[#d62828] text-white hover:bg-[#7e1418] transition-colors"
-                        >
-                          <UserX className="w-4 h-4" aria-hidden /> Desactivar
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() =>
-                            setConfirming({ user: u, kind: 'reactivate' })
-                          }
-                          aria-label={`Reactivar cuenta de ${u.name}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border-2 border-[#d62828] text-[#d62828] hover:bg-[#ffe9e6] transition-colors"
-                        >
-                          <UserCheck className="w-4 h-4" aria-hidden />{' '}
-                          Reactivar
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {rows.map((u) => {
+                const actions = userActions(u, selfId);
+                return (
+                  <tr
+                    key={u.id}
+                    className="border-t border-[#f0ebe8] align-middle"
+                  >
+                    <td className="px-4 py-3">
+                      <p className="font-semibold text-[#171313]">
+                        {u.displayName}
+                        {u.role === 'ADMIN' && (
+                          <span className="ml-2 text-[11px] font-semibold uppercase tracking-wide text-[#8a807c]">
+                            Admin
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-[13px] text-[#8a807c]">
+                        @{u.handle} · {u.email}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3 text-[#4a4340]">
+                      {u.career ?? '—'}
+                    </td>
+                    <td className="px-4 py-3 text-[#4a4340] whitespace-nowrap">
+                      {formatDate(Date.parse(u.createdAt))}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusPill active={u.active} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <VerificationPill status={u.verificationStatus} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-2 flex-wrap">
+                        {!hasActions(actions) && (
+                          <span className="text-[13px] text-[#8a807c]">—</span>
+                        )}
+                        {actions.decide && (
+                          <>
+                            <button
+                              onClick={() => decideVerification(u, 'VERIFIED')}
+                              disabled={decide.isPending}
+                              aria-label={`Verificar cuenta de ${u.displayName}`}
+                              className={ACTION_BUTTON}
+                            >
+                              <BadgeCheck className="w-4 h-4" aria-hidden />{' '}
+                              Verificar
+                            </button>
+                            <button
+                              onClick={() => decideVerification(u, 'REJECTED')}
+                              disabled={decide.isPending}
+                              aria-label={`Rechazar verificación de ${u.displayName}`}
+                              className={ACTION_BUTTON}
+                            >
+                              <BadgeX className="w-4 h-4" aria-hidden />{' '}
+                              Rechazar
+                            </button>
+                          </>
+                        )}
+                        {actions.deactivate && (
+                          <button
+                            onClick={() =>
+                              setConfirming({ user: u, kind: 'deactivate' })
+                            }
+                            aria-label={`Desactivar cuenta de ${u.displayName}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold bg-[#d62828] text-white hover:bg-[#7e1418] transition-colors"
+                          >
+                            <UserX className="w-4 h-4" aria-hidden /> Desactivar
+                          </button>
+                        )}
+                        {actions.reactivate && (
+                          <button
+                            onClick={() =>
+                              setConfirming({ user: u, kind: 'reactivate' })
+                            }
+                            aria-label={`Reactivar cuenta de ${u.displayName}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border-2 border-[#d62828] text-[#d62828] hover:bg-[#ffe9e6] transition-colors"
+                          >
+                            <UserCheck className="w-4 h-4" aria-hidden />{' '}
+                            Reactivar
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Confirmación: una sanción sobre una cuenta no se aplica de un clic */}
-      {confirming && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white w-full max-w-[420px] p-6 rounded-[20px] shadow-2xl">
-            <h2 className="font-['Space_Grotesk',sans-serif] font-bold text-[18px] mb-2">
-              {confirming.kind === 'deactivate'
-                ? 'Desactivar cuenta'
-                : 'Reactivar cuenta'}
-            </h2>
-            <p className="text-[14px] text-[#8a807c] leading-relaxed mb-5">
-              {confirming.kind === 'deactivate'
-                ? `${confirming.user.name} perderá el acceso a la plataforma. Su registro se conserva para auditoría y la acción queda en la bitácora.`
-                : `${confirming.user.name} recuperará el acceso a la plataforma. La acción queda en la bitácora.`}
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setConfirming(null)}
-                className="px-4 py-2.5 rounded-full text-[14px] font-semibold text-[#8a807c] bg-[#f1ece9] hover:bg-[#e3ddd9] transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => {
-                  const { user, kind } = confirming;
-                  if (kind === 'deactivate') {
-                    run(
-                      deactivateAccount(user.id),
-                      `Cuenta de ${user.name} desactivada.`,
-                      `La cuenta de ${user.name} ya se encontraba inactiva.`,
-                    );
-                  } else {
-                    run(
-                      reactivateAccount(user.id),
-                      `Cuenta de ${user.name} reactivada.`,
-                      `La cuenta de ${user.name} ya se encuentra activa.`,
-                    );
-                  }
-                  setConfirming(null);
-                }}
-                className="px-4 py-2.5 rounded-full text-[14px] font-semibold text-white bg-[#d62828] hover:bg-[#7e1418] transition-colors"
-              >
-                {confirming.kind === 'deactivate'
-                  ? 'Desactivar cuenta'
-                  : 'Reactivar cuenta'}
-              </button>
-            </div>
-          </div>
+      {users.hasNextPage && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => users.fetchNextPage()}
+            disabled={users.isFetchingNextPage}
+            className={ACTION_BUTTON}
+          >
+            {users.isFetchingNextPage ? 'Cargando…' : 'Ver más cuentas'}
+          </button>
         </div>
+      )}
+
+      {confirming && (
+        <UserActionDialog
+          user={confirming.user}
+          kind={confirming.kind}
+          pending={deactivate.isPending || reactivate.isPending}
+          onCancel={() => setConfirming(null)}
+          onConfirm={confirmAction}
+        />
       )}
     </section>
   );
