@@ -15,8 +15,8 @@ import { useReportDetail } from '../store/review-queries';
 
 const STATUS_STYLE: Record<ReviewReport['status'], string> = {
   PENDING: 'bg-[#fdf3e2] text-[#b7791f]',
-  SANCTIONED: 'bg-[#ffe9e6] text-[#d62828]',
-  DISMISSED: 'bg-[#f1ece9] text-[#8a807c]',
+  SANCTIONED: 'bg-[#ffe9e6] text-[#c42222]',
+  DISMISSED: 'bg-[#f1ece9] text-[#6b625e]',
 };
 
 const ACTION_BUTTON =
@@ -32,10 +32,10 @@ function ReportedContent({ report }: { report: ReviewReport }) {
         {target.displayName ? (
           <>
             @{target.handle}
-            {note && <em className="text-[#8a807c]"> · {note}</em>}
+            {note && <em className="text-[#6b625e]"> · {note}</em>}
           </>
         ) : (
-          <span className="text-[#8a807c]">Esta cuenta ya no existe.</span>
+          <span className="text-[#6b625e]">Esta cuenta ya no existe.</span>
         )}
       </p>
     );
@@ -46,18 +46,18 @@ function ReportedContent({ report }: { report: ReviewReport }) {
       {current ? (
         <p>“{current}”</p>
       ) : (
-        <p className="text-[#8a807c]">
+        <p className="text-[#6b625e]">
           {target.postState === 'DELETED'
             ? 'La publicación fue borrada por su autor.'
             : 'Sin texto (la publicación solo tiene archivos).'}
         </p>
       )}
       {snapshot && (
-        <p className="text-[13px] text-[#8a807c]">
+        <p className="text-[13px] text-[#6b625e]">
           Al momento del reporte decía: “{snapshot}”
         </p>
       )}
-      {note && <em className="text-[13px] text-[#8a807c]">{note}</em>}
+      {note && <em className="text-[13px] text-[#6b625e]">{note}</em>}
     </div>
   );
 }
@@ -66,7 +66,7 @@ function ReportedContent({ report }: { report: ReviewReport }) {
 function RelatedReports({ id }: { id: string }) {
   const detail = useReportDetail(id, true);
   if (detail.isPending) {
-    return <p className="text-[13px] text-[#8a807c]">Cargando detalle…</p>;
+    return <p className="text-[13px] text-[#6b625e]">Cargando detalle…</p>;
   }
   if (detail.isError) {
     return (
@@ -77,7 +77,7 @@ function RelatedReports({ id }: { id: string }) {
   }
   if (detail.data.related.length === 0) {
     return (
-      <p className="text-[13px] text-[#8a807c]">
+      <p className="text-[13px] text-[#6b625e]">
         No hay otros reportes pendientes sobre esto.
       </p>
     );
@@ -88,7 +88,7 @@ function RelatedReports({ id }: { id: string }) {
         <li key={r.id}>
           {REASON_LABEL[r.reason]} · @{r.reporter.handle} ·{' '}
           {formatDateTime(Date.parse(r.createdAt))}
-          {r.details && <span className="text-[#8a807c]"> · {r.details}</span>}
+          {r.details && <span className="text-[#6b625e]"> · {r.details}</span>}
         </li>
       ))}
     </ul>
@@ -113,12 +113,12 @@ export function ReportCard({
     >
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="flex items-start gap-3 min-w-0">
-          <span className="w-9 h-9 rounded-[12px] bg-[#ffe9e6] text-[#d62828] flex items-center justify-center flex-none">
+          <span className="w-9 h-9 rounded-[12px] bg-[#ffe9e6] text-[#c42222] flex items-center justify-center flex-none">
             <Icon className="w-[18px] h-[18px]" aria-hidden />
           </span>
           <div className="min-w-0">
             <p className="font-semibold text-[15px] text-[#171313]">{title}</p>
-            <p className="text-[13px] text-[#8a807c]">
+            <p className="text-[13px] text-[#6b625e]">
               {REASON_LABEL[report.reason]} · reportado por @
               {report.reporter.handle} ·{' '}
               {formatDateTime(Date.parse(report.createdAt))}
@@ -166,7 +166,7 @@ export function ReportCard({
             <button
               onClick={() => onResolve(report, 'DISMISS')}
               aria-label={`Desestimar reporte contra ${title}`}
-              className={`${ACTION_BUTTON} border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828]`}
+              className={`${ACTION_BUTTON} border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222]`}
             >
               <ShieldOff className="w-4 h-4" aria-hidden /> Desestimar
             </button>
@@ -180,7 +180,7 @@ export function ReportCard({
           </div>
         </>
       ) : (
-        <div className="text-[13px] text-[#8a807c] text-right">
+        <div className="text-[13px] text-[#6b625e] text-right">
           <p>
             Resuelto por {report.resolvedBy?.displayName ?? 'un administrador'}
             {report.resolvedAt &&

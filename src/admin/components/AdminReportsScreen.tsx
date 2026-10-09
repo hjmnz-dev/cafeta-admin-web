@@ -61,7 +61,7 @@ export function AdminReportsScreen() {
         <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
           Informes administrativos
         </h1>
-        <p className="text-[14px] text-[#8a807c]">
+        <p className="text-[14px] text-[#6b625e]">
           Información estructurada y exportable para sustentar decisiones. Cada
           generación queda en la bitácora.
         </p>
@@ -70,7 +70,7 @@ export function AdminReportsScreen() {
       {/* Parámetros del informe */}
       <div className="bg-white border border-[#e3ddd9] rounded-[18px] p-5 mb-5">
         <div className="flex flex-wrap items-end gap-4">
-          <label className="flex flex-col gap-1 text-[12px] text-[#8a807c] min-w-[240px]">
+          <label className="flex flex-col gap-1 text-[12px] text-[#6b625e] min-w-[240px]">
             Tipo de informe
             <select
               aria-label="Tipo de informe"
@@ -85,7 +85,7 @@ export function AdminReportsScreen() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
+          <label className="flex flex-col gap-1 text-[12px] text-[#6b625e]">
             Desde
             <input
               type="date"
@@ -95,7 +95,7 @@ export function AdminReportsScreen() {
               className={field}
             />
           </label>
-          <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
+          <label className="flex flex-col gap-1 text-[12px] text-[#6b625e]">
             Hasta
             <input
               type="date"
@@ -113,12 +113,12 @@ export function AdminReportsScreen() {
             {generate.isPending ? 'Generando…' : 'Generar informe'}
           </button>
         </div>
-        <p className="text-[13px] text-[#8a807c] mt-3">
+        <p className="text-[13px] text-[#6b625e] mt-3">
           {REPORT_KINDS.find((k) => k.value === kind)!.description} Hasta 92
           días, en hora de Santo Domingo.
         </p>
         {alert && (
-          <p role="alert" className="mt-3 text-[14px] text-[#d62828]">
+          <p role="alert" className="mt-3 text-[14px] text-[#c42222]">
             {alert}
           </p>
         )}
@@ -132,14 +132,14 @@ export function AdminReportsScreen() {
               <h2 className="font-['Space_Grotesk',sans-serif] font-bold text-[17px]">
                 {result.title}
               </h2>
-              <p className="text-[13px] text-[#8a807c]">
+              <p className="text-[13px] text-[#6b625e]">
                 Del {result.from} al {result.to}
               </p>
             </div>
             <button
               onClick={onDownload}
               disabled={result.isEmpty || download.isPending}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors disabled:opacity-40 disabled:hover:border-[#e3ddd9] disabled:hover:text-[#4a4340]"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222] transition-colors disabled:opacity-40 disabled:hover:border-[#e3ddd9] disabled:hover:text-[#4a4340]"
             >
               <Download className="w-4 h-4" aria-hidden />
               {download.isPending ? 'Descargando…' : 'Descargar CSV'}
@@ -149,13 +149,13 @@ export function AdminReportsScreen() {
           {result.isEmpty ? (
             <div className="px-5 py-12 text-center">
               <FileBarChart
-                className="w-8 h-8 text-[#8a807c] mx-auto mb-2"
+                className="w-8 h-8 text-[#6b625e] mx-auto mb-2"
                 aria-hidden
               />
               <p className="text-[15px] font-semibold text-[#4a4340]">
                 No hay datos disponibles para este rango
               </p>
-              <p className="text-[13px] text-[#8a807c] mt-1">
+              <p className="text-[13px] text-[#6b625e] mt-1">
                 No se registró actividad de este tipo entre las fechas
                 seleccionadas. Prueba con un rango más amplio.
               </p>
@@ -165,7 +165,7 @@ export function AdminReportsScreen() {
               <table className="w-full border-collapse text-[14px]">
                 <caption className="sr-only">{result.title}</caption>
                 <thead>
-                  <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#8a807c]">
+                  <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#6b625e]">
                     {result.columns.map((c) => (
                       <th
                         key={c}

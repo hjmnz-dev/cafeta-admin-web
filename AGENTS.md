@@ -35,6 +35,7 @@ npm test
 - Una pantalla por archivo en `components/`, lógica pura en `lib/`, estado en `store/`.
 - Alias `@/` apunta a `src/`.
 - Al conectarse a la API, usa el mismo cliente HTTP común que la web (traduce el `code` de error) y los tipos generados desde OpenAPI.
+- Diseño y accesibilidad: los tokens son una copia de los de la web (`Cafeta/design.md`); el texto tenue es `#6b625e` y el rojo de texto `#c42222` (AA sobre los fondos claros), el foco visible es global en `src/styles/index.css`, y todo campo lleva `<label htmlFor>` o `aria-label` y todo botón de solo ícono, `aria-label`. Un cambio de token va en los dos repos.
 
 ## Gotchas
 

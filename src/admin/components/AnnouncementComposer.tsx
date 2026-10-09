@@ -137,7 +137,7 @@ export function AnnouncementComposer({
       <p
         className={
           'text-[12px] mb-3 ' +
-          (length > ANNOUNCEMENT_MAX ? 'text-[#d62828]' : 'text-[#8a807c]')
+          (length > ANNOUNCEMENT_MAX ? 'text-[#c42222]' : 'text-[#6b625e]')
         }
       >
         {length} / {ANNOUNCEMENT_MAX}
@@ -152,9 +152,9 @@ export function AnnouncementComposer({
             >
               <span className="min-w-0 truncate text-[#171313]">
                 {KIND_LABEL[f.kind]} · {f.name}{' '}
-                <span className="text-[#8a807c]">({sizeLabel(f.size)})</span>
+                <span className="text-[#6b625e]">({sizeLabel(f.size)})</span>
                 {f.status === 'uploading' && (
-                  <span className="ml-2 text-[#8a807c]">Subiendo…</span>
+                  <span className="ml-2 text-[#6b625e]">Subiendo…</span>
                 )}
                 {f.status === 'error' && (
                   <span className="ml-2 text-[#b7791f]">{f.error}</span>
@@ -166,7 +166,7 @@ export function AnnouncementComposer({
                   setFiles((current) => current.filter((x) => x.id !== f.id))
                 }
                 aria-label={`Quitar ${f.name}`}
-                className="flex-none text-[#8a807c] hover:text-[#d62828]"
+                className="flex-none text-[#6b625e] hover:text-[#c42222]"
               >
                 <X className="w-4 h-4" aria-hidden />
               </button>
@@ -189,11 +189,11 @@ export function AnnouncementComposer({
           <button
             type="button"
             onClick={() => input.current?.click()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222] transition-colors"
           >
             <Paperclip className="w-4 h-4" aria-hidden /> Adjuntar archivos
           </button>
-          <p className="mt-1.5 text-[12px] text-[#8a807c] max-w-[460px]">
+          <p className="mt-1.5 text-[12px] text-[#6b625e] max-w-[460px]">
             {ALLOWED_FORMATS_TEXT}
           </p>
         </div>

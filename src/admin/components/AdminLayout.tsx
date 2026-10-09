@@ -54,14 +54,14 @@ function SessionBadge() {
         <p className="text-[13px] font-semibold text-[#171313]">
           {user.profile.displayName}
         </p>
-        <p className="text-[12px] text-[#8a807c]">{user.email}</p>
+        <p className="text-[12px] text-[#6b625e]">{user.email}</p>
       </div>
       <button
         type="button"
         onClick={() => void logout()}
         className="flex items-center gap-2 rounded-full border border-[#e3ddd9] bg-white px-3 py-1.5 text-[13px] text-[#4a4340] hover:border-[#d62828]"
       >
-        <LogOut className="w-4 h-4 text-[#8a807c]" aria-hidden />
+        <LogOut className="w-4 h-4 text-[#6b625e]" aria-hidden />
         Cerrar sesión
       </button>
     </div>
@@ -85,7 +85,7 @@ export function AdminLayout() {
               <p className="font-['Space_Grotesk',sans-serif] font-bold text-[17px] lowercase tracking-[-0.03em]">
                 cafeta
               </p>
-              <p className="text-[11px] text-[#8a807c] uppercase tracking-[0.14em] font-['IBM_Plex_Mono',monospace]">
+              <p className="text-[11px] text-[#6b625e] uppercase tracking-[0.14em] font-['IBM_Plex_Mono',monospace]">
                 Consola admin
               </p>
             </div>
@@ -101,7 +101,7 @@ export function AdminLayout() {
               className={({ isActive }) =>
                 'flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] transition-colors ' +
                 (isActive
-                  ? 'bg-[#ffe9e6] text-[#d62828] font-semibold'
+                  ? 'bg-[#ffe9e6] text-[#c42222] font-semibold'
                   : 'text-[#4a4340] hover:bg-[#fbf8f7]')
               }
             >
@@ -119,7 +119,7 @@ export function AdminLayout() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-[#e3ddd9] flex items-start gap-2 text-[11px] text-[#8a807c] leading-snug">
+        <div className="p-4 border-t border-[#e3ddd9] flex items-start gap-2 text-[11px] text-[#6b625e] leading-snug">
           <ShieldCheck className="w-4 h-4 flex-none mt-0.5" aria-hidden />
           <p>
             Toda acción ejecutada aquí queda registrada en la bitácora de
@@ -131,7 +131,7 @@ export function AdminLayout() {
       {/* Contenido */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-[64px] flex-none bg-white border-b border-[#e3ddd9] flex items-center justify-between px-6">
-          <p className="text-[13px] text-[#8a807c]">
+          <p className="text-[13px] text-[#6b625e]">
             Administración y auditoría · FT10
           </p>
           <SessionBadge />
