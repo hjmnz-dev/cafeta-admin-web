@@ -96,9 +96,17 @@ function codeOf(data: unknown): string {
   return 'UNKNOWN';
 }
 
+/**
+ * `as: 'blob'` es para descargas (un CSV): devuelve el archivo tal cual. Los
+ * errores siguen llegando como JSON y se traducen igual.
+ */
 export async function apiRequest<T>(
   path: string,
-  { method = 'GET', body }: { method?: string; body?: unknown } = {},
+  {
+    method = 'GET',
+    body,
+    as = 'json',
+  }: { method?: string; body?: unknown; as?: 'json' | 'blob' } = {},
 ): Promise<T> {
   const session = readStoredSession();
   const headers: Record<string, string> = {};
@@ -123,6 +131,7 @@ export async function apiRequest<T>(
   }
 
   if (res.status === 204) return undefined as T;
+  if (res.ok && as === 'blob') return (await res.blob()) as T;
   const data: unknown = await res.json().catch(() => null);
   if (!res.ok) {
     const code = codeOf(data);
