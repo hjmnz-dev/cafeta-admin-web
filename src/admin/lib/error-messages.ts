@@ -15,6 +15,8 @@ const MESSAGES: Readonly<Record<string, string>> = {
   NETWORK_ERROR: 'No hay conexión con la API. Intenta de nuevo.',
   USER_NOT_FOUND: 'Esa cuenta ya no existe.',
   INVALID_CURSOR: 'La lista cambió. Vuelve a cargarla.',
+  INVALID_DATE_RANGE:
+    'Revisa las fechas: “Desde” no puede ser posterior a “Hasta”.',
   REPORT_NOT_FOUND: 'Ese reporte ya no existe.',
   REPORT_ALREADY_RESOLVED: 'Otro administrador ya resolvió este reporte.',
   NOTE_REQUIRED: 'Escribe la nota de la sanción (al menos 3 caracteres).',

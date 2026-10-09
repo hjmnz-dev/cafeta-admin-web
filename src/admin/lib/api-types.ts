@@ -679,6 +679,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/audit-logs': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Bitácora de auditoría con filtros (solo admin) */
+    get: operations['AdminAuditController_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/admin/audit-logs/actions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Catálogo de acciones auditables (solo admin) */
+    get: operations['AdminAuditController_actions'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/admin/users': {
     parameters: {
       query?: never;
@@ -1235,8 +1269,48 @@ export interface components {
       /** @description Cuentas de estudiantes activas que aún no se verifican. */
       pendingVerifications: number;
     };
-    /** @enum {string} */
+    /**
+     * @description Rol que tenía al actuar.
+     * @enum {string}
+     */
     Role: 'STUDENT' | 'ADMIN';
+    AuditActorDto: {
+      /** @description Usuario de su perfil; null si no tiene. */
+      handle: string | null;
+      /** @description Rol que tenía al actuar. */
+      role: components['schemas']['Role'] | null;
+      id: string;
+      /** @example ana@est.intec.edu.do */
+      email: string;
+    };
+    AdminAuditEntryDto: {
+      /** @description Quién actuó; null si fue un intento sin sesión. */
+      actor: components['schemas']['AuditActorDto'] | null;
+      entityId: string | null;
+      /** @description Datos extra de la acción; su forma depende de la acción. */
+      metadata: {
+        [key: string]: unknown;
+      } | null;
+      ip: string | null;
+      id: string;
+      /** @description Cuándo ocurrió, en ISO 8601. */
+      createdAt: string;
+      /** @example post.create */
+      action: string;
+      /** @example post */
+      entityType: string;
+      /** @description false si el intento fue rechazado (por ejemplo `access.denied`). */
+      succeeded: boolean;
+    };
+    AdminAuditPageDto: {
+      /** @description id para pedir la página siguiente; null si no hay más. */
+      nextCursor: string | null;
+      items: components['schemas']['AdminAuditEntryDto'][];
+    };
+    AuditActionsDto: {
+      /** @description El catálogo de acciones auditables, para llenar un selector. */
+      actions: string[];
+    };
     /** @enum {string} */
     VerificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
     AdminUserViewDto: {
@@ -2439,6 +2513,134 @@ export interface operations {
         content?: never;
       };
       /** @description La cuenta no es admin: FORBIDDEN */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminAuditController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+        /** @description Texto en el correo o el usuario de quien actuó; ignora mayúsculas. */
+        actor?: string;
+        /** @description Una acción del catálogo, por ejemplo `post.create`. */
+        action?:
+          | 'account.register'
+          | 'account.deactivate'
+          | 'account.reactivate'
+          | 'account.verify'
+          | 'account.reject_verification'
+          | 'profile.update'
+          | 'privacy.update'
+          | 'report.generate'
+          | 'post.create'
+          | 'post.update'
+          | 'post.archive'
+          | 'post.restore'
+          | 'post.deactivate'
+          | 'post.reactivate'
+          | 'post.delete'
+          | 'story.create'
+          | 'story.update'
+          | 'story.deactivate'
+          | 'post_comment.create'
+          | 'post_comment.update'
+          | 'post_comment.deactivate'
+          | 'story_comment.create'
+          | 'story_comment.update'
+          | 'story_comment.deactivate'
+          | 'message.update'
+          | 'message.deactivate'
+          | 'announcement.create'
+          | 'follow.create'
+          | 'follow.accept'
+          | 'follow.reject'
+          | 'follow.deactivate'
+          | 'block.create'
+          | 'block.deactivate'
+          | 'report.create'
+          | 'report.sanction'
+          | 'report.dismiss'
+          | 'access.denied'
+          | 'career.deactivate'
+          | 'career.reactivate'
+          | 'monitoring.test';
+        entityType?:
+          | 'user'
+          | 'profile'
+          | 'career'
+          | 'post'
+          | 'post_comment'
+          | 'story'
+          | 'story_comment'
+          | 'message'
+          | 'follow'
+          | 'block'
+          | 'report'
+          | 'route'
+          | 'monitoring';
+        /** @description `true` solo los que se completaron, `false` solo los rechazados. */
+        succeeded?: boolean;
+        /** @description Primer día, AAAA-MM-DD en hora de Santo Domingo (inclusivo). */
+        from?: string;
+        /** @description Último día, AAAA-MM-DD en hora de Santo Domingo (inclusivo). */
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminAuditPageDto'];
+        };
+      };
+      /** @description Filtro inválido (VALIDATION_ERROR), rango de fechas inválido (INVALID_DATE_RANGE) o cursor ajeno (INVALID_CURSOR) */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No es admin: FORBIDDEN */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminAuditController_actions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AuditActionsDto'];
+        };
+      };
+      /** @description No es admin: FORBIDDEN */
       403: {
         headers: {
           [name: string]: unknown;
