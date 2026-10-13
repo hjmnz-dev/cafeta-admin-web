@@ -1,12 +1,23 @@
 import { useState } from 'react';
 import { isValidReason, REASON_MAX, REASON_MIN } from '../lib/users';
-import { sanctionLabel, siblingsWarning, targetTitle } from '../lib/review';
+import { actionTitle, siblingsWarning, targetTitle } from '../lib/review';
 import type { ResolveAction, ReviewReport } from '../lib/review-api';
 
 /**
- * Confirmación al resolver un reporte (HU51, HU52). Sancionar exige la nota que
- * queda en la bitácora; desestimar la deja opcional.
+ * Confirmación al resolver un reporte (HU51, HU52). Sancionar (al objetivo o,
+ * desde una publicación, a la cuenta de su autor) exige la nota que queda en la
+ * bitácora; desestimar la deja opcional.
  */
+
+function consequence(report: ReviewReport, action: ResolveAction): string {
+  if (action === 'DISMISS') {
+    return 'El reporte se cierra sin aplicar ninguna restricción. Quien lo envió podrá reportar de nuevo si hace falta.';
+  }
+  if (action === 'DEACTIVATE_AUTHOR') {
+    return `La cuenta de ${report.target.displayName ?? 'su autor'} quedará desactivada: no podrá entrar y sus publicaciones dejarán de verse. También se cierran los reportes pendientes contra esa cuenta. La acción queda en la bitácora con tu nota.`;
+  }
+  return `${targetTitle(report)} quedará desactivado y su dueño no podrá usarlo. La acción queda en la bitácora con tu nota.`;
+}
 export function ReportResolveDialog({
   report,
   action,
@@ -21,8 +32,8 @@ export function ReportResolveDialog({
   onConfirm: (note: string) => void;
 }) {
   const [note, setNote] = useState('');
-  const sanction = action === 'DEACTIVATE_TARGET';
-  const title = sanction ? sanctionLabel(report) : 'Desestimar reporte';
+  const sanction = action !== 'DISMISS';
+  const title = actionTitle(report, action);
   const canSend = !pending && (!sanction || isValidReason(note));
 
   return (
@@ -40,9 +51,7 @@ export function ReportResolveDialog({
           {title}
         </h2>
         <p className="text-[14px] text-[#8a807c] leading-relaxed mb-3">
-          {sanction
-            ? `${targetTitle(report)} quedará desactivado y su dueño no podrá usarlo. La acción queda en la bitácora con tu nota.`
-            : 'El reporte se cierra sin aplicar ninguna restricción. Quien lo envió podrá reportar de nuevo si hace falta.'}
+          {consequence(report, action)}
         </p>
         {sanction && report.otherPending > 0 && (
           <p className="text-[13px] mb-3 px-3 py-2 rounded-[12px] bg-[#fdf3e2] text-[#b7791f]">

@@ -65,6 +65,23 @@ export const sanctionLabel = (report: ReviewReport) =>
     ? 'Desactivar usuario'
     : 'Desactivar publicación';
 
+/**
+ * Desde el reporte de una publicación también se puede desactivar la cuenta de
+ * su autor (bug 1023); hace falta saber quién es, así que no en una borrada.
+ */
+export const canDeactivateAuthor = (report: ReviewReport) =>
+  report.targetType === 'POST' && Boolean(report.target.displayName);
+
+/** Título de cada acción: el del botón, el del diálogo y el de confirmar. */
+export function actionTitle(
+  report: ReviewReport,
+  action: ResolveAction,
+): string {
+  if (action === 'DISMISS') return 'Desestimar reporte';
+  if (action === 'DEACTIVATE_AUTHOR') return 'Desactivar cuenta';
+  return sanctionLabel(report);
+}
+
 /** Cuántos reportes más se cierran junto con el sancionado, en singular o plural. */
 export function closedAlongside(count: number): string {
   if (count === 0) return '';
@@ -90,9 +107,11 @@ export function resolvedNotice(
     return `Reporte contra ${title} desestimado: se cerró sin aplicar restricciones.`;
   }
   const what =
-    report.targetType === 'USER'
-      ? `la cuenta de ${title} quedó desactivada`
-      : 'la publicación quedó desactivada';
+    action === 'DEACTIVATE_AUTHOR'
+      ? `la cuenta de ${report.target.displayName ?? 'su autor'} quedó desactivada`
+      : report.targetType === 'USER'
+        ? `la cuenta de ${title} quedó desactivada`
+        : 'la publicación quedó desactivada';
   const extra = closedAlongside(report.otherPending);
   return `Reporte resuelto con sanción: ${what}.${extra}`;
 }
