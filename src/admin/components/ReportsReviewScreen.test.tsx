@@ -118,7 +118,7 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
     ).toBeInTheDocument();
   });
 
-  it('HU52, escenario 1 — sancionar pide la nota, desactiva y avisa', async () => {
+  it('HU52 E1: sancionar pide la nota, desactiva y avisa', async () => {
     const user = userEvent.setup();
     renderScreen();
     await screen.findByText('Laura Batista', { exact: false });
@@ -205,7 +205,7 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('HU51, escenario 1 — sancionar a un usuario avisa que la cuenta quedó desactivada', async () => {
+  it('HU51 E1: sancionar a un usuario avisa que la cuenta quedó desactivada', async () => {
     const user = userEvent.setup();
     renderScreen();
     await screen.findByText('Roberto Díaz');
@@ -245,7 +245,7 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
     ).toBeInTheDocument();
   });
 
-  it('Escenario 2 — desestimar no pide nota y no toca la cuenta', async () => {
+  it('HU51 E2: desestimar no pide nota y no toca la cuenta', async () => {
     const user = userEvent.setup();
     renderScreen();
     await screen.findByText('Roberto Díaz');

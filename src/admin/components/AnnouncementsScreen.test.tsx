@@ -98,7 +98,7 @@ describe('HU24 — Anuncios institucionales', () => {
     ).toHaveLength(1);
   });
 
-  it('publicar: el botón espera texto, cuenta los caracteres y manda el texto recortado', async () => {
+  it('HU24 E1: publicar el anuncio: el botón espera texto, cuenta los caracteres y manda el texto recortado', async () => {
     const user = userEvent.setup();
     api.create.mockResolvedValue({ id: 'nuevo' });
     renderScreen();

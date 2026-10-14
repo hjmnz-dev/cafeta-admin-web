@@ -31,7 +31,7 @@ describe('HU43, escenario 2 — acceso denegado a quien no es administrador', ()
     vi.mocked(authApi.logout).mockResolvedValue(undefined);
   });
 
-  it('una cuenta de estudiante ve "No tienes acceso a la consola"', async () => {
+  it('HU43 E2: una cuenta de estudiante ve "No tienes acceso a la consola"', async () => {
     login.mockResolvedValue({
       accessToken: 't',
       expiresAt: new Date(Date.now() + 60_000).toISOString(),
