@@ -116,6 +116,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/posts/archived': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PostsController_archived'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/posts/{id}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['PostsController_archive'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/posts/{id}/restore': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['PostsController_restore'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/posts/feed': {
     parameters: {
       query?: never;
@@ -275,6 +323,22 @@ export interface paths {
     options?: never;
     head?: never;
     patch: operations['PrivacyController_update'];
+    trace?: never;
+  };
+  '/api/v1/me/profile': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations['MeProfileController_update'];
     trace?: never;
   };
   '/api/v1/follows/requests': {
@@ -662,6 +726,303 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/stories': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['StoriesController_tray'];
+    put?: never;
+    post: operations['StoriesController_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/stories/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Corrige el texto de una historia propia vigente; la vigencia no cambia. */
+    patch: operations['StoriesController_edit'];
+    trace?: never;
+  };
+  '/api/v1/stories/{id}/deactivate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Desactiva una historia propia vigente (baja lógica, sin reactivar). */
+    post: operations['StoriesController_deactivate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/stories/{id}/reaction': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Pone mi reacción: la crea, la reactiva o cambia su tipo. */
+    put: operations['StoryReactionsController_set'];
+    post?: never;
+    /** Quita mi reacción; si no tenía, no falla. */
+    delete: operations['StoryReactionsController_remove'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/stories/{id}/reactions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Quién reaccionó a mi historia y con qué; solo para su autor. */
+    get: operations['StoryReactorsController_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/stories/{id}/comments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Comentarios de la historia, del más antiguo al más nuevo. */
+    get: operations['StoryCommentsController_list'];
+    put?: never;
+    post: operations['StoryCommentsController_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/stories/{id}/comments/{commentId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Corrige un comentario propio; queda marcado como editado. */
+    patch: operations['StoryCommentsController_edit'];
+    trace?: never;
+  };
+  '/api/v1/stories/{id}/comments/{commentId}/deactivate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Retira un comentario propio (baja lógica: se conserva para auditoría). */
+    post: operations['StoryCommentsController_deactivate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/posts/{id}/reaction': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Pone mi reacción: la crea, la reactiva o cambia su tipo. */
+    put: operations['PostReactionsController_set'];
+    post?: never;
+    /** Quita mi reacción; si no tenía, no falla. */
+    delete: operations['PostReactionsController_remove'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/posts/{id}/comments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Comentarios de la publicación, del más antiguo al más nuevo. */
+    get: operations['PostCommentsController_list'];
+    put?: never;
+    post: operations['PostCommentsController_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/posts/{id}/comments/{commentId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Corrige un comentario propio; queda marcado como editado. */
+    patch: operations['PostCommentsController_edit'];
+    trace?: never;
+  };
+  '/api/v1/posts/{id}/comments/{commentId}/deactivate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Retira un comentario propio (baja lógica: se conserva para auditoría). */
+    post: operations['PostCommentsController_deactivate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/posts/{id}/save': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Guarda la publicación de otra persona; guardarla dos veces deja una sola. */
+    put: operations['SavedPostsController_save'];
+    post?: never;
+    /** La quita de mi lista sin tocar la publicación; si no estaba, no falla. */
+    delete: operations['SavedPostsController_remove'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/me/saved': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Mis guardadas, la más reciente primero. */
+    get: operations['SavedPostsController_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/reports': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reportar a un usuario o una publicación (HU55, HU56). */
+    post: operations['ReportsController_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/auth/forgot-password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Pide un enlace por correo para restablecer la contraseña
+     * @description Responde igual exista o no la cuenta. El límite es de 3 pedidos por hora por IP.
+     */
+    post: operations['PasswordResetController_forgotPassword'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/auth/reset-password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Pone una contraseña nueva con el token del correo
+     * @description El token sirve una sola vez y dura 30 minutos. Al usarlo se cierran todas las sesiones.
+     */
+    post: operations['PasswordResetController_resetPassword'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/admin/dashboard': {
     parameters: {
       query?: never;
@@ -988,6 +1349,16 @@ export interface components {
       | 'CODE'
       | 'STUDY_GROUP'
       | 'ANNOUNCEMENT';
+    /**
+     * @description ACTIVE se ve en el feed y el perfil; ARCHIVED y DEACTIVATED solo las ve su autor.
+     * @enum {string}
+     */
+    PostState: 'ACTIVE' | 'ARCHIVED' | 'DEACTIVATED';
+    /**
+     * @description Mi reacción activa a la publicación; null si no he reaccionado.
+     * @enum {string}
+     */
+    ReactionType: 'HEART' | 'FIRE' | 'CLAP' | 'LAUGH' | 'WOW';
     /** @enum {string} */
     MediaType: 'IMAGE' | 'VIDEO' | 'DOCUMENT';
     PostMediaDto: {
@@ -1012,12 +1383,16 @@ export interface components {
       content: string | null;
       /** @example Biblioteca */
       location: string | null;
+      /** @description ACTIVE se ve en el feed y el perfil; ARCHIVED y DEACTIVATED solo las ve su autor. */
+      state: components['schemas']['PostState'];
       editedAt: string | null;
       eventStartsAt: string | null;
       eventLocation: string | null;
       codeSnippet: string | null;
       groupName: string | null;
       groupSpots: number | null;
+      /** @description Mi reacción activa a la publicación; null si no he reaccionado. */
+      myReaction: components['schemas']['ReactionType'] | null;
       id: string;
       /** @description Fecha de creación en ISO 8601. */
       createdAt: string;
@@ -1026,6 +1401,8 @@ export interface components {
       author: components['schemas']['PostAuthorDto'];
       reactionCount: number;
       commentCount: number;
+      /** @description true si guardé la publicación (spec 0009, decisión 19). */
+      savedByMe: boolean;
     };
     PostPageDto: {
       items: components['schemas']['PostViewDto'][];
@@ -1100,10 +1477,14 @@ export interface components {
     ProfileViewDto: {
       /** @example Ingeniería de Software */
       careerName: string | null;
+      careerId: string | null;
+      /** @description Enlace de lectura de la foto (vence en una hora como máximo), o null si no tiene. */
+      avatarUrl: string | null;
       visibility: components['schemas']['ProfileVisibility'];
       /** @description Seguimiento de quien pregunta hacia este perfil. */
       followStatus: components['schemas']['FollowState'];
       bio: string | null;
+      location: string | null;
       tags: components['schemas']['ProfileTagDto'][];
       id: string;
       /** @example cgomez_intec */
@@ -1125,6 +1506,25 @@ export interface components {
     };
     UpdatePrivacyDto: {
       visibility: components['schemas']['ProfileVisibility'];
+    };
+    UpdateProfileTagDto: {
+      category: components['schemas']['TagCategory'];
+      /** @example React */
+      label: string;
+    };
+    UpdateProfileDto: {
+      bio?: string | null;
+      location?: string | null;
+      /** @description Clave que devolvió POST /uploads (una imagen). null quita la foto. */
+      avatarKey?: string | null;
+      tags?: components['schemas']['UpdateProfileTagDto'][];
+      /**
+       * @description No puede quedar vacío.
+       * @example Carlos Gómez
+       */
+      displayName?: string;
+      /** Format: uuid */
+      careerId?: string;
     };
     FollowUserViewDto: {
       /** Format: uuid */
@@ -1297,8 +1697,167 @@ export interface components {
       /** Format: date-time */
       blockedAt: string;
     };
+    SearchUserViewDto: {
+      /** Format: uuid */
+      id: string;
+      handle: string;
+      displayName: string;
+      avatarUrl: string | null;
+      careerName: string | null;
+      verified: boolean;
+      /** @description Seguimiento de quien busca hacia esta persona. */
+      followStatus: components['schemas']['FollowState'];
+      /** @description false en los perfiles PRIVATE: no se muestra el botón Seguir. */
+      canFollow: boolean;
+    };
+    SearchUserPageDto: {
+      items: components['schemas']['SearchUserViewDto'][];
+      nextCursor: string | null;
+    };
     DeactivateAccountDto: {
       /** @description La contraseña actual: confirma que quien desactiva es el dueño de la cuenta. */
+      password: string;
+    };
+    CreateStoryDto: {
+      /** @description Clave que devolvió POST /uploads: una imagen o un video (obligatorio). */
+      mediaKey: string;
+      /** @description Texto opcional de hasta 280 caracteres. */
+      text?: string;
+    };
+    StoryMediaDto: {
+      mediaType: components['schemas']['MediaType'];
+      /** @description Enlace de lectura que vence en una hora como máximo. */
+      url: string;
+      /** @example image/jpeg */
+      mimeType: string;
+    };
+    StoryViewDto: {
+      text: string | null;
+      editedAt: string | null;
+      /** @description Mi reacción a la historia, o null si no he reaccionado. */
+      myReaction: components['schemas']['ReactionType'] | null;
+      /** @description Reacciones de usuarios activos; solo lo ve el autor, para los demás es null. */
+      reactionCount: number | null;
+      id: string;
+      media: components['schemas']['StoryMediaDto'];
+      /** @description Fecha de creación en ISO 8601. */
+      createdAt: string;
+      /** @description Vence 24 horas después de crearse y no cambia al editar. */
+      expiresAt: string;
+      /** @description Comentarios activos de usuarios activos. */
+      commentCount: number;
+    };
+    StoryAuthorDto: {
+      /** @description Enlace de lectura de la foto, o null si no tiene. */
+      avatarUrl: string | null;
+      id: string;
+      /** @example cgomez_intec */
+      handle: string;
+      displayName: string;
+    };
+    StoryGroupDto: {
+      author: components['schemas']['StoryAuthorDto'];
+      stories: components['schemas']['StoryViewDto'][];
+    };
+    StoryTrayDto: {
+      groups: components['schemas']['StoryGroupDto'][];
+    };
+    EditStoryDto: {
+      /** @description Texto nuevo, de hasta 280 caracteres. Vacío quita el texto: la imagen o el video ya son obligatorios. */
+      text: string;
+    };
+    SetReactionDto: {
+      type: components['schemas']['ReactionType'];
+    };
+    StoryReactionStateDto: {
+      myReaction: components['schemas']['ReactionType'] | null;
+      /** @description Reacciones activas de usuarios activos; solo para el autor, null para los demás. */
+      reactionCount: number | null;
+    };
+    StoryReactorDto: {
+      /** Format: uuid */
+      id: string;
+      type: components['schemas']['ReactionType'];
+      /** Format: date-time */
+      createdAt: string;
+      user: components['schemas']['FollowUserViewDto'];
+    };
+    StoryReactorPageDto: {
+      items: components['schemas']['StoryReactorDto'][];
+      nextCursor: string | null;
+    };
+    CommentAuthorDto: {
+      /** @description Enlace de lectura de la foto, o null si no tiene. */
+      avatarUrl: string | null;
+      id: string;
+      /** @example cgomez_intec */
+      handle: string;
+      displayName: string;
+    };
+    CommentViewDto: {
+      editedAt: string | null;
+      id: string;
+      content: string;
+      /** @description Fecha de creación en ISO 8601. */
+      createdAt: string;
+      author: components['schemas']['CommentAuthorDto'];
+      /** @description true si el comentario es mío: la web ofrece editar y desactivar. */
+      isMine: boolean;
+    };
+    CommentPageDto: {
+      items: components['schemas']['CommentViewDto'][];
+      /** @description id para pedir la página siguiente; null cuando no hay más. */
+      nextCursor: string | null;
+    };
+    CommentContentDto: {
+      /** @description Texto del comentario, de 1 a 500 caracteres sin los bordes. */
+      content: string;
+    };
+    ReactionStateDto: {
+      myReaction: components['schemas']['ReactionType'] | null;
+      /** @description Reacciones activas de usuarios activos. */
+      reactionCount: number;
+    };
+    CreateReportDto: {
+      /** @enum {string} */
+      targetType: 'USER' | 'POST';
+      /**
+       * Format: uuid
+       * @description id del usuario o de la publicación, según targetType.
+       */
+      targetId: string;
+      /** @enum {string} */
+      reason:
+        'SPAM' | 'HARASSMENT' | 'INAPPROPRIATE' | 'IMPERSONATION' | 'OTHER';
+      /** @description Hasta 500 caracteres. Obligatorio cuando el motivo es OTHER. */
+      details?: string;
+    };
+    ReportViewDto: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      targetType: 'USER' | 'POST';
+      /** Format: uuid */
+      targetId: string;
+      /** @enum {string} */
+      reason:
+        'SPAM' | 'HARASSMENT' | 'INAPPROPRIATE' | 'IMPERSONATION' | 'OTHER';
+      /** @enum {string} */
+      status: 'PENDING' | 'SANCTIONED' | 'DISMISSED';
+      /** Format: date-time */
+      createdAt: string;
+    };
+    ForgotPasswordDto: {
+      /**
+       * Format: email
+       * @example 1113672@est.intec.edu.do
+       */
+      email: string;
+    };
+    ResetPasswordDto: {
+      /** @description El token del enlace del correo. */
+      token: string;
+      /** @description De 8 a 72 caracteres, con al menos una letra y un número (igual que al registrarse). */
       password: string;
     };
     CountWithRecentDto: {
@@ -1519,10 +2078,11 @@ export interface components {
       /** @description Obligatoria al sancionar (3 a 500 caracteres); opcional al desestimar. */
       note?: string;
       /**
-       * @description DISMISS cierra solo este reporte; DEACTIVATE_TARGET sanciona al objetivo.
+       * @description DISMISS cierra solo este reporte; DEACTIVATE_TARGET sanciona al objetivo;
+       *     DEACTIVATE_AUTHOR (solo reportes de publicación) desactiva la cuenta del autor.
        * @enum {string}
        */
-      action: 'DISMISS' | 'DEACTIVATE_TARGET';
+      action: 'DISMISS' | 'DEACTIVATE_TARGET' | 'DEACTIVATE_AUTHOR';
     };
   };
   responses: never;
@@ -1683,15 +2243,77 @@ export interface operations {
       };
     };
   };
-  PostsController_feed: {
+  PostsController_archived: {
     parameters: {
       query: {
-        /** @description Sin careerId es "Para ti"; con él, la pestaña de esa carrera. */
-        careerId?: string;
         /** @description id de la última publicación de la página anterior. */
         cursor?: string;
         /** @description De 1 a 50; 20 si no se envía. */
         limit: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PostPageDto'];
+        };
+      };
+    };
+  };
+  PostsController_archive: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PostsController_restore: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PostsController_feed: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+        /** @description Sin careerId es "Para ti"; con él, la pestaña de esa carrera. */
+        careerId?: string;
       };
       header?: never;
       path?: never;
@@ -1958,6 +2580,29 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['PrivacyDto'];
+        };
+      };
+    };
+  };
+  MeProfileController_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateProfileDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProfileViewDto'];
         };
       };
     };
@@ -2506,7 +3151,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['FollowUserPageDto'];
+          'application/json': components['schemas']['SearchUserPageDto'];
         };
       };
     };
@@ -2582,6 +3227,547 @@ export interface operations {
       };
     };
   };
+  StoriesController_tray: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StoryTrayDto'];
+        };
+      };
+    };
+  };
+  StoriesController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStoryDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StoryViewDto'];
+        };
+      };
+    };
+  };
+  StoriesController_edit: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EditStoryDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StoryViewDto'];
+        };
+      };
+    };
+  };
+  StoriesController_deactivate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  StoryReactionsController_set: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetReactionDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StoryReactionStateDto'];
+        };
+      };
+    };
+  };
+  StoryReactionsController_remove: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StoryReactionStateDto'];
+        };
+      };
+    };
+  };
+  StoryReactorsController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StoryReactorPageDto'];
+        };
+      };
+    };
+  };
+  StoryCommentsController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CommentPageDto'];
+        };
+      };
+    };
+  };
+  StoryCommentsController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CommentContentDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CommentViewDto'];
+        };
+      };
+    };
+  };
+  StoryCommentsController_edit: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        commentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CommentContentDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CommentViewDto'];
+        };
+      };
+    };
+  };
+  StoryCommentsController_deactivate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        commentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PostReactionsController_set: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetReactionDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReactionStateDto'];
+        };
+      };
+    };
+  };
+  PostReactionsController_remove: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReactionStateDto'];
+        };
+      };
+    };
+  };
+  PostCommentsController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CommentPageDto'];
+        };
+      };
+    };
+  };
+  PostCommentsController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CommentContentDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CommentViewDto'];
+        };
+      };
+    };
+  };
+  PostCommentsController_edit: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        commentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CommentContentDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CommentViewDto'];
+        };
+      };
+    };
+  };
+  PostCommentsController_deactivate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        commentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  SavedPostsController_save: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  SavedPostsController_remove: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  SavedPostsController_list: {
+    parameters: {
+      query: {
+        /** @description id de la última publicación de la página anterior. */
+        cursor?: string;
+        /** @description De 1 a 50; 20 si no se envía. */
+        limit: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PostPageDto'];
+        };
+      };
+    };
+  };
+  ReportsController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReportDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReportViewDto'];
+        };
+      };
+    };
+  };
+  PasswordResetController_forgotPassword: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ForgotPasswordDto'];
+      };
+    };
+    responses: {
+      /** @description Si la cuenta existe, el correo salió */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Más de 3 pedidos en una hora */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PasswordResetController_resetPassword: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResetPasswordDto'];
+      };
+    };
+    responses: {
+      /** @description La contraseña cambió */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description RESET_TOKEN_INVALID (venció, ya se usó o no existe) */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   AdminDashboardController_metrics: {
     parameters: {
       query?: never;
@@ -2631,6 +3817,7 @@ export interface operations {
           | 'account.reactivate'
           | 'account.verify'
           | 'account.reject_verification'
+          | 'account.password_reset'
           | 'profile.update'
           | 'privacy.update'
           | 'report.generate'
