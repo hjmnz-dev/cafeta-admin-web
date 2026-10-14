@@ -92,7 +92,7 @@ describe('HU45 — Bitácora de auditoría', () => {
     });
   });
 
-  it('escenario 1 — muestra quién, qué, sobre qué y cuándo de cada registro', async () => {
+  it('HU45 E1: muestra quién, qué, sobre qué y cuándo de cada registro', async () => {
     renderAudit();
 
     const table = await rowsLoaded(2);
@@ -134,7 +134,7 @@ describe('HU45 — Bitácora de auditoría', () => {
     );
   });
 
-  it('escenario 2 — filtra por acción, resultado y responsable en la API', async () => {
+  it('HU45 E2: filtra por acción, resultado y responsable en la API', async () => {
     const user = userEvent.setup();
     renderAudit();
     await screen.findByRole('table');

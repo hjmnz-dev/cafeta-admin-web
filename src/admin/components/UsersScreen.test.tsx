@@ -89,7 +89,7 @@ describe('HU47 — Ver listado de usuarios', () => {
     api.list.mockResolvedValue(page([MARIA, JUAN, ANA]));
   });
 
-  it('Escenario 1 — lista las cuentas reales con su estado y datos básicos', async () => {
+  it('HU47 E1: lista las cuentas reales con su estado y datos básicos', async () => {
     renderUsers();
 
     expect(await screen.findByText('María Rodríguez')).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe('HU47 — Ver listado de usuarios', () => {
     expect(screen.getByText('Pendiente')).toBeInTheDocument();
   });
 
-  it('Escenario 2 — la búsqueda pide a la API el texto escrito', async () => {
+  it('HU47 E2: la búsqueda pide a la API el texto escrito', async () => {
     const userEvt = userEvent.setup();
     renderUsers();
     await screen.findByText('María Rodríguez');
@@ -184,7 +184,7 @@ describe('HU48/HU49 — Desactivar y reactivar cuentas', () => {
     api.reactivate.mockResolvedValue(undefined);
   });
 
-  it('HU48, escenario 1 — desactivar pide el motivo, lo envía y vuelve a pedir la lista', async () => {
+  it('HU48 E1: desactivar pide el motivo, lo envía y vuelve a pedir la lista', async () => {
     const userEvt = userEvent.setup();
     renderUsers();
     await screen.findByText('María Rodríguez');
@@ -240,7 +240,7 @@ describe('HU48/HU49 — Desactivar y reactivar cuentas', () => {
     expect(api.deactivate).not.toHaveBeenCalled();
   });
 
-  it('HU49, escenario 1 — reactivar envía el motivo y avisa', async () => {
+  it('HU49 E1: reactivar envía el motivo y avisa', async () => {
     const userEvt = userEvent.setup();
     renderUsers();
     await screen.findByText('Ana Martínez');
@@ -262,7 +262,7 @@ describe('HU48/HU49 — Desactivar y reactivar cuentas', () => {
     );
   });
 
-  it('HU49, escenario 2 — no ofrece reactivar una cuenta que ya está activa', async () => {
+  it('HU49 E2: no ofrece reactivar una cuenta que ya está activa', async () => {
     renderUsers();
     await screen.findByText('María Rodríguez');
 
@@ -318,7 +318,7 @@ describe('HU50 — Verificar cuenta institucional', () => {
     api.decideVerification.mockResolvedValue(undefined);
   });
 
-  it('Escenario 1 — verificar envía VERIFIED y avisa', async () => {
+  it('HU50 E1: verificar envía VERIFIED y avisa', async () => {
     const userEvt = userEvent.setup();
     renderUsers();
     await screen.findByText('Juan Pérez');
@@ -335,7 +335,7 @@ describe('HU50 — Verificar cuenta institucional', () => {
     );
   });
 
-  it('Escenario 2 — rechazar envía REJECTED y avisa', async () => {
+  it('HU50 E2: rechazar envía REJECTED y avisa', async () => {
     const userEvt = userEvent.setup();
     renderUsers();
     await screen.findByText('Juan Pérez');

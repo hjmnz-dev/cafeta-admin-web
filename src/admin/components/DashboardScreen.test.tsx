@@ -43,7 +43,7 @@ const tileOf = async (label: string) =>
 describe('HU43, escenario 1 — el administrador ve las métricas reales', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('muestra cada indicador con su cifra y su aclaración de 7 días', async () => {
+  it('HU43 E1: muestra cada indicador con su cifra y su aclaración de 7 días', async () => {
     metrics.mockResolvedValue(DATA);
     renderDashboard();
 
