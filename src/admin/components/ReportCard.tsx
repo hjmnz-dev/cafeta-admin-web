@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { FileText, Gavel, ShieldOff, User } from 'lucide-react';
+import { FileText, Gavel, ShieldOff, User, UserX } from 'lucide-react';
 import { formatDateTime } from '../lib/format';
 import { userMessageOf } from '../lib/http';
 import {
+  canDeactivateAuthor,
   postTexts,
   REASON_LABEL,
   sanctionLabel,
@@ -177,6 +178,15 @@ export function ReportCard({
             >
               <Gavel className="w-4 h-4" aria-hidden /> {sanctionLabel(report)}
             </button>
+            {canDeactivateAuthor(report) && (
+              <button
+                onClick={() => onResolve(report, 'DEACTIVATE_AUTHOR')}
+                aria-label={`Desactivar la cuenta de ${report.target.displayName}: reporte contra ${title}`}
+                className={`${ACTION_BUTTON} bg-[#7e1418] text-white hover:bg-[#5c0e11]`}
+              >
+                <UserX className="w-4 h-4" aria-hidden /> Desactivar cuenta
+              </button>
+            )}
           </div>
         </>
       ) : (

@@ -34,6 +34,8 @@ const MESSAGES: Readonly<Record<string, string>> = {
   MEDIA_COMBINATION_INVALID: 'Adjunta hasta 4 imágenes, o 1 video, o 1 PDF.',
   CANNOT_ACT_ON_SELF: 'No puedes actuar sobre tu propia cuenta.',
   CANNOT_SANCTION_ADMIN: 'No se puede desactivar a otro administrador.',
+  NOT_A_POST_REPORT:
+    'Solo el reporte de una publicación permite desactivar la cuenta del autor.',
 };
 
 export const GENERIC_ERROR_MESSAGE = 'Algo salió mal. Intenta de nuevo.';

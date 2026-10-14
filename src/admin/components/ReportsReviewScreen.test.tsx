@@ -151,6 +151,60 @@ describe('HU51/HU52 — Revisar reportes de la comunidad', () => {
     await waitFor(() => expect(api.list.mock.calls.length).toBeGreaterThan(1));
   });
 
+  it('bug 1023 — desde una publicación se puede desactivar la cuenta del autor', async () => {
+    const user = userEvent.setup();
+    renderScreen();
+    await screen.findByText('Laura Batista', { exact: false });
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /desactivar la cuenta de laura batista: reporte/i,
+      }),
+    );
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveTextContent(
+      /la cuenta de laura batista quedará desactivada/i,
+    );
+    const confirm = within(dialog).getByRole('button', {
+      name: 'Desactivar cuenta',
+    });
+    expect(confirm).toBeDisabled();
+    await user.type(
+      within(dialog).getByLabelText('Nota de la sanción'),
+      'Suplantación',
+    );
+    await user.click(confirm);
+
+    await waitFor(() =>
+      expect(api.resolve).toHaveBeenCalledWith(
+        'r2',
+        'DEACTIVATE_AUTHOR',
+        'Suplantación',
+      ),
+    );
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      /la cuenta de laura batista quedó desactivada/i,
+    );
+  });
+
+  it('bug 1023 — un reporte de usuario o de una publicación borrada no ofrece desactivar al autor', async () => {
+    api.list.mockResolvedValue(
+      page([
+        userReport(),
+        postReport({
+          id: 'r3',
+          target: { ...NO_TARGET, postId: 'p2', postState: 'DELETED' },
+        }),
+      ]),
+    );
+    renderScreen();
+    await screen.findByText('Roberto Díaz');
+
+    expect(
+      screen.queryByRole('button', { name: /desactivar la cuenta de/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it('HU51, escenario 1 — sancionar a un usuario avisa que la cuenta quedó desactivada', async () => {
     const user = userEvent.setup();
     renderScreen();
