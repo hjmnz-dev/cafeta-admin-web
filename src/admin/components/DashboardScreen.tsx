@@ -33,21 +33,21 @@ function StatTile({
       <div className="flex items-center gap-2 mb-2">
         <Icon
           className={
-            'w-4 h-4 ' + (urgent ? 'text-[#d62828]' : 'text-[#8a807c]')
+            'w-4 h-4 ' + (urgent ? 'text-[#c42222]' : 'text-[#6b625e]')
           }
           aria-hidden
         />
-        <span className="text-[13px] text-[#8a807c]">{label}</span>
+        <span className="text-[13px] text-[#6b625e]">{label}</span>
       </div>
       <p
         className={
           "font-['Space_Grotesk',sans-serif] font-bold text-[30px] leading-none " +
-          (urgent ? 'text-[#d62828]' : 'text-[#171313]')
+          (urgent ? 'text-[#c42222]' : 'text-[#171313]')
         }
       >
         {value}
       </p>
-      <p className="text-[12px] text-[#8a807c] mt-1.5 leading-snug">{hint}</p>
+      <p className="text-[12px] text-[#6b625e] mt-1.5 leading-snug">{hint}</p>
     </>
   );
 
@@ -78,7 +78,7 @@ export function DashboardScreen() {
         <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
           Dashboard
         </h1>
-        <p className="text-[14px] text-[#8a807c]">
+        <p className="text-[14px] text-[#6b625e]">
           Estado general de la plataforma y trabajo pendiente de administración.
         </p>
       </header>
@@ -86,7 +86,7 @@ export function DashboardScreen() {
       {isPending && (
         <p
           role="status"
-          className="flex items-center gap-2 text-[14px] text-[#8a807c]"
+          className="flex items-center gap-2 text-[14px] text-[#6b625e]"
         >
           <CircleDashed className="w-4 h-4" aria-hidden />
           Cargando indicadores…
@@ -150,7 +150,7 @@ export function DashboardScreen() {
               hint="Aún no vencen y no están desactivadas"
             />
           </div>
-          <p className="text-[12px] text-[#8a807c]">
+          <p className="text-[12px] text-[#6b625e]">
             Actualizado a las {TIME.format(new Date(data.generatedAt))}
           </p>
         </>

@@ -41,7 +41,7 @@ export function LoginScreen() {
             <p className="font-['Space_Grotesk',sans-serif] font-bold text-[17px] lowercase tracking-[-0.03em]">
               cafeta
             </p>
-            <p className="text-[11px] text-[#8a807c] uppercase tracking-[0.14em] font-['IBM_Plex_Mono',monospace]">
+            <p className="text-[11px] text-[#6b625e] uppercase tracking-[0.14em] font-['IBM_Plex_Mono',monospace]">
               Consola admin
             </p>
           </div>
@@ -50,7 +50,7 @@ export function LoginScreen() {
         <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[22px] mb-1">
           Iniciar sesión
         </h1>
-        <p className="text-[14px] text-[#8a807c] mb-5">
+        <p className="text-[14px] text-[#6b625e] mb-5">
           Solo para cuentas de administración.
         </p>
 
@@ -89,7 +89,7 @@ export function LoginScreen() {
         {error && (
           <p
             role="alert"
-            className="text-[14px] text-[#d62828] bg-[#ffe9e6] rounded-[12px] px-3 py-2 mb-4"
+            className="text-[14px] text-[#c42222] bg-[#ffe9e6] rounded-[12px] px-3 py-2 mb-4"
           >
             {error}
           </p>
@@ -103,7 +103,7 @@ export function LoginScreen() {
           {busy ? 'Entrando…' : 'Entrar'}
         </button>
 
-        <p className="flex items-start gap-2 text-[11px] text-[#8a807c] leading-snug mt-5">
+        <p className="flex items-start gap-2 text-[11px] text-[#6b625e] leading-snug mt-5">
           <ShieldCheck className="w-4 h-4 flex-none" aria-hidden />
           Cada acceso y cada acción queda registrada en la bitácora de
           auditoría.

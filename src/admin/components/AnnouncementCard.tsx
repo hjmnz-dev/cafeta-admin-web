@@ -12,10 +12,10 @@ const BUTTON =
 
 function stateOf(item: Announcement): { label: string; tone: string } {
   if (item.deactivatedAt) {
-    return { label: 'Desactivado', tone: 'bg-[#f3efed] text-[#8a807c]' };
+    return { label: 'Desactivado', tone: 'bg-[#f3efed] text-[#6b625e]' };
   }
   if (item.archivedAt) {
-    return { label: 'Archivado', tone: 'bg-[#f3efed] text-[#8a807c]' };
+    return { label: 'Archivado', tone: 'bg-[#f3efed] text-[#6b625e]' };
   }
   return { label: 'Activo', tone: 'bg-[#e8f3ec] text-[#2f7d4f]' };
 }
@@ -35,7 +35,7 @@ export function AnnouncementCard({
   return (
     <li className="bg-white border border-[#e3ddd9] rounded-[18px] p-5">
       <div className="flex items-start justify-between gap-3 mb-2">
-        <p className="text-[13px] text-[#8a807c]">
+        <p className="text-[13px] text-[#6b625e]">
           {formatDateTime(Date.parse(item.createdAt))} · {item.publishedBy}
           {item.editedAt ? ' · editado' : ''}
         </p>
@@ -76,7 +76,7 @@ export function AnnouncementCard({
       )}
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[12px] text-[#8a807c]">
+        <p className="text-[12px] text-[#6b625e]">
           {item.reactionCount} reacciones · {item.commentCount} comentarios
         </p>
         {item.active && !confirming && (
@@ -84,7 +84,7 @@ export function AnnouncementCard({
             type="button"
             onClick={() => setConfirming(true)}
             aria-label="Desactivar anuncio"
-            className={`${BUTTON} border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828]`}
+            className={`${BUTTON} border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222]`}
           >
             Desactivar
           </button>

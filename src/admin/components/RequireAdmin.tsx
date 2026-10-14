@@ -24,13 +24,13 @@ export function RequireAdmin({
   return (
     <div className="max-w-[560px] mx-auto mt-16 bg-white border border-[#e3ddd9] rounded-[20px] p-8 text-center">
       <ShieldAlert
-        className="w-10 h-10 text-[#d62828] mx-auto mb-3"
+        className="w-10 h-10 text-[#c42222] mx-auto mb-3"
         aria-hidden
       />
       <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[20px] mb-2">
         Acceso denegado
       </h1>
-      <p className="text-[15px] text-[#8a807c] leading-relaxed">
+      <p className="text-[15px] text-[#6b625e] leading-relaxed">
         Tu cuenta no tiene permisos administrativos para ver{' '}
         <strong className="text-[#4a4340]">{section}</strong>.
       </p>

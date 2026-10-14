@@ -62,7 +62,7 @@ export function AuditLogScreen() {
         <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
           Bitácora de auditoría
         </h1>
-        <p className="text-[14px] text-[#8a807c]">
+        <p className="text-[14px] text-[#6b625e]">
           El sistema anota cada acción relevante, ejecutada o rechazada. Solo se
           puede consultar.
         </p>
@@ -72,7 +72,7 @@ export function AuditLogScreen() {
       <div className="flex flex-wrap items-end gap-3 mb-4">
         <div className="relative flex-1 min-w-[240px]">
           <Search
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#8a807c]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#6b625e]"
             aria-hidden
           />
           <input
@@ -84,7 +84,7 @@ export function AuditLogScreen() {
             className={`w-full pl-11 ${FIELD}`}
           />
         </div>
-        <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
+        <label className="flex flex-col gap-1 text-[12px] text-[#6b625e]">
           Acción
           <select
             aria-label="Filtrar por acción"
@@ -100,7 +100,7 @@ export function AuditLogScreen() {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
+        <label className="flex flex-col gap-1 text-[12px] text-[#6b625e]">
           Resultado
           <select
             aria-label="Filtrar por resultado"
@@ -117,7 +117,7 @@ export function AuditLogScreen() {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
+        <label className="flex flex-col gap-1 text-[12px] text-[#6b625e]">
           Desde
           <input
             type="date"
@@ -127,7 +127,7 @@ export function AuditLogScreen() {
             className={FIELD}
           />
         </label>
-        <label className="flex flex-col gap-1 text-[12px] text-[#8a807c]">
+        <label className="flex flex-col gap-1 text-[12px] text-[#6b625e]">
           Hasta
           <input
             type="date"
@@ -140,7 +140,7 @@ export function AuditLogScreen() {
         {filtering && (
           <button
             onClick={() => setFilters(NO_AUDIT_FILTERS)}
-            className="px-4 py-2 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors"
+            className="px-4 py-2 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222] transition-colors"
           >
             Limpiar filtros
           </button>
@@ -178,7 +178,7 @@ export function AuditLogScreen() {
               Historial de acciones registradas por el sistema
             </caption>
             <thead>
-              <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#8a807c]">
+              <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#6b625e]">
                 <th scope="col" className="px-4 py-3 font-semibold">
                   Fecha y hora
                 </th>
@@ -201,7 +201,7 @@ export function AuditLogScreen() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-4 py-10 text-center text-[#8a807c]"
+                    className="px-4 py-10 text-center text-[#6b625e]"
                   >
                     Cargando registros…
                   </td>
@@ -211,7 +211,7 @@ export function AuditLogScreen() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-4 py-10 text-center text-[#8a807c]"
+                    className="px-4 py-10 text-center text-[#6b625e]"
                   >
                     Ningún registro coincide con los filtros aplicados.
                   </td>
@@ -227,13 +227,13 @@ export function AuditLogScreen() {
                     {e.actor ? (
                       <>
                         <p className="text-[#171313]">{e.actor.email}</p>
-                        <p className="text-[12px] text-[#8a807c]">
+                        <p className="text-[12px] text-[#6b625e]">
                           {e.actor.handle ? `@${e.actor.handle} · ` : ''}
                           {roleLabel(e.actor.role)}
                         </p>
                       </>
                     ) : (
-                      <p className="text-[#8a807c]">Sin sesión</p>
+                      <p className="text-[#6b625e]">Sin sesión</p>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -245,7 +245,7 @@ export function AuditLogScreen() {
                         />
                       ) : (
                         <XCircle
-                          className="w-4 h-4 text-[#d62828] flex-none"
+                          className="w-4 h-4 text-[#c42222] flex-none"
                           aria-label="Rechazada"
                         />
                       )}
@@ -253,7 +253,7 @@ export function AuditLogScreen() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-[#4a4340]">{targetLabel(e)}</td>
-                  <td className="px-4 py-3 text-[#8a807c] max-w-[380px] break-words">
+                  <td className="px-4 py-3 text-[#6b625e] max-w-[380px] break-words">
                     {describeMetadata(e.metadata)}
                   </td>
                 </tr>
@@ -268,7 +268,7 @@ export function AuditLogScreen() {
           <button
             onClick={loadMore}
             disabled={logs.isFetchingNextPage}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222] transition-colors disabled:opacity-50"
           >
             {logs.isFetchingNextPage ? 'Cargando…' : 'Ver más registros'}
           </button>

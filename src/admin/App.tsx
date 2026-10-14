@@ -25,7 +25,7 @@ function Console() {
     return (
       <div
         role="status"
-        className="min-h-screen flex items-center justify-center bg-[#efebe8] text-[14px] text-[#8a807c]"
+        className="min-h-screen flex items-center justify-center bg-[#efebe8] text-[14px] text-[#6b625e]"
       >
         Cargando…
       </div>

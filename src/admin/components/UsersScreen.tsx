@@ -48,7 +48,7 @@ const SEARCH_DELAY_MS = 300;
 type Notice = { tone: 'ok' | 'warn'; text: string };
 
 const ACTION_BUTTON =
-  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors disabled:opacity-50';
+  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222] transition-colors disabled:opacity-50';
 
 export function UsersScreen() {
   const { user: session } = useSession();
@@ -122,7 +122,7 @@ export function UsersScreen() {
         <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
           Usuarios
         </h1>
-        <p className="text-[14px] text-[#8a807c]">
+        <p className="text-[14px] text-[#6b625e]">
           Gestión de estado y verificación institucional.
         </p>
       </header>
@@ -145,7 +145,7 @@ export function UsersScreen() {
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[260px]">
           <Search
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#8a807c]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#6b625e]"
             aria-hidden
           />
           <input
@@ -198,7 +198,7 @@ export function UsersScreen() {
               Cuentas registradas en la plataforma
             </caption>
             <thead>
-              <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#8a807c]">
+              <tr className="bg-[#fbf8f7] text-left text-[12px] uppercase tracking-wide text-[#6b625e]">
                 <th scope="col" className="px-4 py-3 font-semibold">
                   Cuenta
                 </th>
@@ -224,7 +224,7 @@ export function UsersScreen() {
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-4 py-10 text-center text-[#8a807c]"
+                    className="px-4 py-10 text-center text-[#6b625e]"
                   >
                     Cargando cuentas…
                   </td>
@@ -234,7 +234,7 @@ export function UsersScreen() {
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-4 py-10 text-center text-[#8a807c]"
+                    className="px-4 py-10 text-center text-[#6b625e]"
                   >
                     Ninguna cuenta coincide con la búsqueda.
                   </td>
@@ -252,12 +252,12 @@ export function UsersScreen() {
                       <p className="font-semibold text-[#171313]">
                         {u.displayName}
                         {u.role === 'ADMIN' && (
-                          <span className="ml-2 text-[11px] font-semibold uppercase tracking-wide text-[#8a807c]">
+                          <span className="ml-2 text-[11px] font-semibold uppercase tracking-wide text-[#6b625e]">
                             Admin
                           </span>
                         )}
                       </p>
-                      <p className="text-[13px] text-[#8a807c]">
+                      <p className="text-[13px] text-[#6b625e]">
                         @{u.handle} · {u.email}
                       </p>
                     </td>
@@ -276,7 +276,7 @@ export function UsersScreen() {
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2 flex-wrap">
                         {!hasActions(actions) && (
-                          <span className="text-[13px] text-[#8a807c]">—</span>
+                          <span className="text-[13px] text-[#6b625e]">—</span>
                         )}
                         {actions.decide && (
                           <>
@@ -317,7 +317,7 @@ export function UsersScreen() {
                               setConfirming({ user: u, kind: 'reactivate' })
                             }
                             aria-label={`Reactivar cuenta de ${u.displayName}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border-2 border-[#d62828] text-[#d62828] hover:bg-[#ffe9e6] transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border-2 border-[#d62828] text-[#c42222] hover:bg-[#ffe9e6] transition-colors"
                           >
                             <UserCheck className="w-4 h-4" aria-hidden />{' '}
                             Reactivar

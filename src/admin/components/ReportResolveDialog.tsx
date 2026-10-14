@@ -50,7 +50,7 @@ export function ReportResolveDialog({
         >
           {title}
         </h2>
-        <p className="text-[14px] text-[#8a807c] leading-relaxed mb-3">
+        <p className="text-[14px] text-[#6b625e] leading-relaxed mb-3">
           {consequence(report, action)}
         </p>
         {sanction && report.otherPending > 0 && (
@@ -79,7 +79,7 @@ export function ReportResolveDialog({
           <button
             onClick={onCancel}
             disabled={pending}
-            className="px-4 py-2.5 rounded-full text-[14px] font-semibold text-[#8a807c] bg-[#f1ece9] hover:bg-[#e3ddd9] transition-colors disabled:opacity-60"
+            className="px-4 py-2.5 rounded-full text-[14px] font-semibold text-[#6b625e] bg-[#f1ece9] hover:bg-[#e3ddd9] transition-colors disabled:opacity-60"
           >
             Cancelar
           </button>

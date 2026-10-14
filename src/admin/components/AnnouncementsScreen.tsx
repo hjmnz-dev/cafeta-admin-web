@@ -43,7 +43,7 @@ export function AnnouncementsScreen() {
         <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
           Anuncios institucionales
         </h1>
-        <p className="text-[14px] text-[#8a807c]">
+        <p className="text-[14px] text-[#6b625e]">
           Avisos oficiales que ve toda la comunidad, con su marca de oficial.
         </p>
       </header>
@@ -84,10 +84,10 @@ export function AnnouncementsScreen() {
       )}
 
       {announcements.isPending && (
-        <p className="py-6 text-center text-[#8a807c]">Cargando anuncios…</p>
+        <p className="py-6 text-center text-[#6b625e]">Cargando anuncios…</p>
       )}
       {announcements.isSuccess && rows.length === 0 && (
-        <p className="py-6 text-center text-[#8a807c]">
+        <p className="py-6 text-center text-[#6b625e]">
           Todavía no has publicado ningún anuncio.
         </p>
       )}
@@ -108,7 +108,7 @@ export function AnnouncementsScreen() {
           <button
             onClick={() => announcements.fetchNextPage()}
             disabled={announcements.isFetchingNextPage}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#d62828] transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold border border-[#e3ddd9] text-[#4a4340] hover:border-[#d62828] hover:text-[#c42222] transition-colors disabled:opacity-50"
           >
             {announcements.isFetchingNextPage
               ? 'Cargando…'

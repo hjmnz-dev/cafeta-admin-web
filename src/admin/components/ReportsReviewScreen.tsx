@@ -54,7 +54,7 @@ function ReportList({
   const items = queue.data?.pages.flatMap((page) => page.items) ?? [];
 
   if (queue.isPending) {
-    return <p className="text-[14px] text-[#8a807c]">Cargando reportes…</p>;
+    return <p className="text-[14px] text-[#6b625e]">Cargando reportes…</p>;
   }
   if (queue.isError) {
     return (
@@ -75,11 +75,11 @@ function ReportList({
   if (items.length === 0) {
     return (
       <div className="bg-white border border-[#e3ddd9] rounded-[18px] p-10 text-center">
-        <Flag className="w-8 h-8 text-[#8a807c] mx-auto mb-2" aria-hidden />
+        <Flag className="w-8 h-8 text-[#6b625e] mx-auto mb-2" aria-hidden />
         <p className="text-[15px] text-[#4a4340] font-semibold">
           {empty.title}
         </p>
-        <p className="text-[13px] text-[#8a807c] mt-1">{empty.hint}</p>
+        <p className="text-[13px] text-[#6b625e] mt-1">{empty.hint}</p>
       </div>
     );
   }
@@ -143,7 +143,7 @@ export function ReportsReviewScreen() {
         <h1 className="font-['Space_Grotesk',sans-serif] font-bold text-[24px]">
           Reportes de la comunidad
         </h1>
-        <p className="text-[14px] text-[#8a807c]">
+        <p className="text-[14px] text-[#6b625e]">
           Denuncias enviadas por estudiantes desde la app. Sancionar desactiva
           el objetivo y cierra todos los reportes pendientes sobre él.
         </p>
