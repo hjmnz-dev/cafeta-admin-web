@@ -1,6 +1,6 @@
 <div align="center">
   <br />
-  <img src="docs/readme/banner.webp" alt="Banner de la consola de Cafeta">
+  <img src="docs/readme/banner-en.webp" alt="Cafeta admin console banner">
   <br />
 
   <div>
@@ -11,161 +11,163 @@
 <img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white" alt="TanStack Query" />
   </div>
 
-  <h3 align="center">Cafeta · Consola de administración</h3>
+  <h3 align="center">Cafeta · Admin Console</h3>
 
   <p align="center"><a href="https://cafeta-admin-hj01.azurewebsites.net">cafeta-admin-hj01.azurewebsites.net</a></p>
 
-  <p align="center">La consola web con la que se supervisa y modera Cafeta, la red social de la comunidad universitaria de INTEC.</p>
+  <p align="center">The web console used to oversee and moderate Cafeta, the social network for the INTEC university community.</p>
+
+  <p align="center"><b>English</b> · <a href="README.es.md">Español</a></p>
 </div>
 
-## 📋 <a name="table">Tabla de contenido</a>
+## 📋 <a name="table">Table of Contents</a>
 
-1. ✨ [Introducción](#introduction)
-2. 📸 [Pantallas](#screens)
-3. ⚙️ [Stack](#tech-stack)
-4. 🔋 [Funciones](#features)
-5. 🗂️ [Estructura](#project-structure)
-6. 🤸 [Inicio rápido](#quick-start)
-7. 🧪 [Pruebas](#tests)
-8. 🚀 [Despliegue](#deployment)
-9. 🧩 [Los otros repos](#related)
-10. 📬 [Contacto](#contact)
+1. ✨ [Introduction](#introduction)
+2. 📸 [Screens](#screens)
+3. ⚙️ [Tech Stack](#tech-stack)
+4. 🔋 [Features](#features)
+5. 🗂️ [Project Structure](#project-structure)
+6. 🤸 [Quick Start](#quick-start)
+7. 🧪 [Tests](#tests)
+8. 🚀 [Deployment](#deployment)
+9. 🧩 [Related Repos](#related)
+10. 📬 [Contact](#contact)
 
-## <a name="introduction">✨ Introducción</a>
+## <a name="introduction">✨ Introduction</a>
 
-La app de Cafeta es de teléfono y para estudiantes. Moderar una comunidad es otro trabajo: de pantalla ancha, con tablas y con permisos distintos. Por eso la administración vive en su propia aplicación.
+The Cafeta app is built for phones and for students. Moderating a community is a different job: wide screens, tables and different permissions. That is why administration lives in its own application.
 
-Solo entra quien tiene rol `ADMIN`, y esas cuentas no se registran por la web: nacen en la semilla o con un comando de la API. Cada pantalla lee y escribe en [cafeta-api](https://github.com/hjmnz-dev/cafeta-api), y las acciones de la consola quedan en la bitácora de auditoría.
+Only users with the `ADMIN` role can sign in, and those accounts can't be created from the web: they come from the seed or from an API command. Every screen reads from and writes to [cafeta-api](https://github.com/hjmnz-dev/cafeta-api), and console actions are recorded in the audit log.
 
-Nació como proyecto académico en INTEC y está desplegada en producción.
+It started as an academic project at INTEC and runs in production. The interface is in Spanish, the language of its users.
 
-## <a name="screens">📸 Pantallas</a>
+## <a name="screens">📸 Screens</a>
 
-Capturas con los datos ficticios de la semilla de demo.
+Screenshots with the fictional data from the demo seed.
 
 <div align="center">
-  <img src="docs/readme/dashboard.webp" width="49%" alt="Dashboard con indicadores de la plataforma">
-  <img src="docs/readme/usuarios.webp" width="49%" alt="Listado de usuarios con estado y verificación">
-  <img src="docs/readme/reportes.webp" width="49%" alt="Revisión de reportes de la comunidad">
-  <img src="docs/readme/bitacora.webp" width="49%" alt="Bitácora de auditoría">
+  <img src="docs/readme/dashboard.webp" width="49%" alt="Dashboard with platform indicators">
+  <img src="docs/readme/usuarios.webp" width="49%" alt="User list with status and verification">
+  <img src="docs/readme/reportes.webp" width="49%" alt="Community report review">
+  <img src="docs/readme/bitacora.webp" width="49%" alt="Audit log">
 </div>
 
-## <a name="tech-stack">⚙️ Stack</a>
+## <a name="tech-stack">⚙️ Tech Stack</a>
 
-- **[React 18](https://react.dev)** y **[TypeScript](https://www.typescriptlang.org)** en modo strict.
-- **[Vite 6](https://vite.dev)** para el servidor de desarrollo y el build.
-- **[Tailwind CSS 4](https://tailwindcss.com)** y **[Lucide](https://lucide.dev)** para la interfaz.
-- **[React Router 7](https://reactrouter.com)** para las rutas.
-- **[TanStack Query 5](https://tanstack.com/query)** para los datos, con tipos generados desde el OpenAPI de la API.
-- **[Sentry](https://sentry.io)** para el monitoreo de errores.
-- **[Vitest](https://vitest.dev)** y **[Testing Library](https://testing-library.com)** para las pruebas; **oxlint** y **Prettier** para lint y formato.
+- **[React 18](https://react.dev)** and **[TypeScript](https://www.typescriptlang.org)** in strict mode.
+- **[Vite 6](https://vite.dev)** for the development server and production build.
+- **[Tailwind CSS 4](https://tailwindcss.com)** and **[Lucide](https://lucide.dev)** for the interface.
+- **[React Router 7](https://reactrouter.com)** for routing.
+- **[TanStack Query 5](https://tanstack.com/query)** for data, with types generated from the API's OpenAPI contract.
+- **[Sentry](https://sentry.io)** for error monitoring.
+- **[Vitest](https://vitest.dev)** and **[Testing Library](https://testing-library.com)** for tests; **oxlint** and **Prettier** for linting and formatting.
 
-## <a name="features">🔋 Funciones</a>
+## <a name="features">🔋 Features</a>
 
-👉 **Dashboard**: Reportes pendientes, cuentas por verificar, usuarios activos, publicaciones e historias vigentes de un vistazo.
+👉 **Dashboard**: Pending reports, accounts awaiting verification, active users, posts and live stories at a glance.
 
-👉 **Usuarios**: Búsqueda por nombre, usuario o correo, filtros por estado y verificación institucional.
+👉 **Users**: Search by name, username or email, with filters by status and institutional verification.
 
-👉 **Desactivar y reactivar cuentas**: Con confirmación y una nota obligatoria. La baja es lógica: la cuenta conserva su registro.
+👉 **Deactivate and Reactivate Accounts**: With confirmation and a required note. Deactivation is soft: the account keeps its record.
 
-👉 **Reportes de la comunidad**: Revisa lo que denuncian los estudiantes y desestímalo, desactiva la publicación o desactiva la cuenta.
+👉 **Community Reports**: Review what students report and dismiss it, deactivate the post or deactivate the account.
 
-👉 **Anuncios institucionales**: Redacta y publica avisos para la comunidad.
+👉 **Institutional Announcements**: Write and publish announcements for the community.
 
-👉 **Bitácora de auditoría**: Consulta quién hizo qué y cuándo, con filtros y solo de lectura.
+👉 **Audit Log**: Read-only view of who did what and when, with filters.
 
-👉 **Informes**: Actividad y moderación por rango de fechas, con descarga en CSV.
+👉 **Reports**: Activity and moderation by date range, with CSV download.
 
-👉 **Acceso controlado**: Todas las secciones pasan por `RequireAdmin`, y la API vuelve a exigir el rol en cada ruta.
+👉 **Access Control**: Every section goes through `RequireAdmin`, and the API checks the role again on every route.
 
-👉 **Errores claros**: Un solo cliente HTTP traduce cada `code` de la API a un mensaje en español.
+👉 **Clear Errors**: A single HTTP client translates each API `code` into a message in Spanish.
 
-## <a name="project-structure">🗂️ Estructura</a>
+## <a name="project-structure">🗂️ Project Structure</a>
 
 ```text
 deploy/
-└── server.mjs        Servidor estático de producción en App Service
-docs/readme/          Imágenes de este README
-public/               Iconos
+└── server.mjs        Production static server on App Service
+docs/readme/          Images for this README
+public/               Icons
 src/
 ├── admin/
-│   ├── components/   Una pantalla por archivo y sus piezas
-│   ├── lib/          Lógica pura, cliente HTTP y tipos generados desde OpenAPI
-│   ├── store/        Sesión y hooks de TanStack Query por pantalla
-│   └── routes.tsx    Rutas, todas bajo RequireAdmin
-├── styles/           Tokens de marca y base de Tailwind
-└── test/             Configuración de las pruebas
+│   ├── components/   One screen per file, plus its pieces
+│   ├── lib/          Pure logic, HTTP client and types generated from OpenAPI
+│   ├── store/        Session and TanStack Query hooks per screen
+│   └── routes.tsx    Routes, all behind RequireAdmin
+├── styles/           Brand tokens and Tailwind base
+└── test/             Test setup
 ```
 
-## <a name="quick-start">🤸 Inicio rápido</a>
+## <a name="quick-start">🤸 Quick Start</a>
 
-Sigue estos pasos para correr la consola en tu máquina.
+Follow these steps to run the console on your machine.
 
-**Requisitos**
+**Prerequisites**
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/en) 24, con npm
-- [cafeta-api](https://github.com/hjmnz-dev/cafeta-api) corriendo en el puerto 3000; su README explica cómo levantarla con datos de demo
+- [Node.js](https://nodejs.org/en) 24, with npm
+- [cafeta-api](https://github.com/hjmnz-dev/cafeta-api) running on port 3000; its README explains how to start it with demo data
 
-**Clonar el repositorio**
+**Cloning the Repository**
 
 ```bash
 git clone https://github.com/hjmnz-dev/cafeta-admin-web.git
 cd cafeta-admin-web
 ```
 
-**Instalación**
+**Installation**
 
 ```bash
 npm install
 ```
 
-**Correr el proyecto**
+**Running the Project**
 
-Usa el puerto 5174, que es el `ADMIN_ORIGIN` de la API:
+Use port 5174, which is the API's `ADMIN_ORIGIN`:
 
 ```bash
 npm run dev -- --port 5174
 ```
 
-Abre [http://localhost:5174](http://localhost:5174) en tu navegador y entra con el `SEED_ADMIN_EMAIL` y el `SEED_ADMIN_PASSWORD` de tu `.env` de la API.
+Open [http://localhost:5174](http://localhost:5174) in your browser and sign in with the `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` from the API's `.env`.
 
-**Variables de entorno**
+**Environment Variables**
 
-No necesitas ninguna en local: sin `VITE_API_URL`, la consola usa `http://localhost:3000/api/v1`, y sin `VITE_SENTRY_DSN` no envía nada a Sentry. Están explicadas en [`.env.example`](.env.example).
+None are needed locally: without `VITE_API_URL`, the console uses `http://localhost:3000/api/v1`, and without `VITE_SENTRY_DSN` it sends nothing to Sentry. They are explained in [`.env.example`](.env.example).
 
-## <a name="tests">🧪 Pruebas</a>
+## <a name="tests">🧪 Tests</a>
 
 ```bash
-npm test              # pruebas con Vitest y Testing Library
-npm run lint          # revisa todo el repo y falla con cualquier aviso
-npm run format:check  # revisa el formato
-npm run typecheck     # revisa los tipos
-npm run api:types     # regenera los tipos desde OpenAPI, con la API en el puerto 3000
+npm test              # tests with Vitest and Testing Library
+npm run lint          # checks the whole repo and fails on any warning
+npm run format:check  # checks formatting
+npm run typecheck     # checks types
+npm run api:types     # regenerates the types from OpenAPI, with the API on port 3000
 ```
 
-Husky y lint-staged revisan lint, formato y tipos antes de cada commit, y el CI repite todo en cada push y en cada PR.
+Husky and lint-staged check linting, formatting and types before every commit, and CI runs everything again on every push and pull request.
 
-## <a name="deployment">🚀 Despliegue</a>
+## <a name="deployment">🚀 Deployment</a>
 
-La consola corre en [cafeta-admin-hj01.azurewebsites.net](https://cafeta-admin-hj01.azurewebsites.net), en [Azure App Service](https://azure.microsoft.com/products/app-service) (Canada Central). Cada push a `main` corre el CI y, solo si todo pasa, el job `deploy`:
+The console runs at [cafeta-admin-hj01.azurewebsites.net](https://cafeta-admin-hj01.azurewebsites.net), on [Azure App Service](https://azure.microsoft.com/products/app-service) (Canada Central). Every push to `main` runs CI and, only if everything passes, the `deploy` job:
 
-1. Compila con la URL de la API y el DSN de Sentry del ambiente `production`.
-2. Sube los source maps a Sentry y comprueba que ninguno quede publicado.
-3. Entra a Azure con OIDC, sin contraseñas guardadas en GitHub, y sube `dist/` con `deploy/server.mjs`.
-4. Espera a que `/version.txt` muestre el commit nuevo.
+1. Builds with the API URL and Sentry DSN from the `production` environment.
+2. Uploads the source maps to Sentry and checks that none get published.
+3. Signs in to Azure with OIDC, with no passwords stored in GitHub, and uploads `dist/` with `deploy/server.mjs`.
+4. Waits until `/version.txt` shows the new commit.
 
-Las demás ramas y los PR nunca despliegan.
+Other branches and pull requests never deploy.
 
-## <a name="related">🧩 Los otros repos</a>
+## <a name="related">🧩 Related Repos</a>
 
-Cafeta son tres repositorios que se despliegan por separado:
+Cafeta is made of three repositories that deploy separately:
 
-- **[cafeta-api](https://github.com/hjmnz-dev/cafeta-api)**: la API.
-- **[cafeta-app](https://github.com/hjmnz-dev/cafeta-app)**: la app web del estudiante.
-- **[cafeta-admin-web](https://github.com/hjmnz-dev/cafeta-admin-web)**: esta consola.
+- **[cafeta-api](https://github.com/hjmnz-dev/cafeta-api)**: the API.
+- **[cafeta-app](https://github.com/hjmnz-dev/cafeta-app)**: the student web app.
+- **[cafeta-admin-web](https://github.com/hjmnz-dev/cafeta-admin-web)**: this console.
 
-## <a name="contact">📬 Contacto</a>
+## <a name="contact">📬 Contact</a>
 
 **Hamsell Jiménez**
 
