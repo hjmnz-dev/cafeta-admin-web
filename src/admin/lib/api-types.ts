@@ -1274,7 +1274,7 @@ export interface components {
     RegisterDto: {
       /**
        * Format: email
-       * @example 1113672@est.intec.edu.do
+       * @example estudiante@est.intec.edu.do
        */
       email: string;
       /** @description De 8 a 72 caracteres, con al menos una letra y un número. */
@@ -1301,7 +1301,7 @@ export interface components {
       /** @enum {string} */
       verificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
       id: string;
-      /** @example 1113672@est.intec.edu.do */
+      /** @example estudiante@est.intec.edu.do */
       email: string;
       /**
        * @description Fecha de registro.
@@ -1318,7 +1318,7 @@ export interface components {
       user: components['schemas']['CurrentUserDto'];
     };
     LoginDto: {
-      /** @example 1113672@est.intec.edu.do */
+      /** @example estudiante@est.intec.edu.do */
       email: string;
       password: string;
       /** @description Con true la sesión dura 30 días; sin él, 12 horas. */
@@ -1850,7 +1850,7 @@ export interface components {
     ForgotPasswordDto: {
       /**
        * Format: email
-       * @example 1113672@est.intec.edu.do
+       * @example estudiante@est.intec.edu.do
        */
       email: string;
     };
