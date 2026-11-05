@@ -1,56 +1,174 @@
-# Cafeta · Consola de administración
+<div align="center">
+  <br />
+  <img src="docs/readme/banner.webp" alt="Banner de la consola de Cafeta">
+  <br />
 
-Aplicación web de escritorio para **FT10 – Administración y auditoría**, el defecto **DEF-11** del Informe de Inspección de Fagan. Se separa de la app móvil (`Cafeta(antiguamente UniConnect)`) a propósito: el trabajo administrativo es de pantalla ancha y tablas, y sus permisos no tienen nada que ver con los de un estudiante.
+  <div>
+<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+<img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+<img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white" alt="TanStack Query" />
+  </div>
 
-## Historias cubiertas
+  <h3 align="center">Cafeta · Consola de administración</h3>
 
-| HU          | Qué hace                                                                        | Dónde                                |
-| ----------- | ------------------------------------------------------------------------------- | ------------------------------------ |
-| HU43        | Dashboard con indicadores de uso y actividad                                    | `components/DashboardScreen.tsx`     |
-| HU44        | Informes administrativos con rango de fechas y descarga CSV                     | `components/AdminReportsScreen.tsx`  |
-| HU45        | Bitácora de auditoría con filtros por responsable, acción y fechas              | `components/AuditLogScreen.tsx`      |
-| HU46        | Registro automático de cada acción relevante, incluidos los intentos rechazados | `store/AdminState.tsx`               |
-| HU47        | Listado de cuentas con búsqueda por nombre o correo                             | `components/UsersScreen.tsx`         |
-| HU48 · HU49 | Desactivar y reactivar cuentas, con confirmación                                | `components/UsersScreen.tsx`         |
-| HU50        | Verificar o rechazar la verificación institucional                              | `components/UsersScreen.tsx`         |
-| HU51 · HU52 | Revisar denuncias de usuarios y publicaciones: sancionar o desestimar           | `components/ReportsReviewScreen.tsx` |
+  <p align="center"><a href="https://cafeta-admin-hj01.azurewebsites.net">cafeta-admin-hj01.azurewebsites.net</a></p>
 
-El control de acceso (HU43/HU48, escenario 2) vive en `components/RequireAdmin.tsx`: sin permisos no se muestra la sección y el intento queda en la bitácora.
+  <p align="center">La consola web con la que se supervisa y modera Cafeta, la red social de la comunidad universitaria de INTEC.</p>
+</div>
 
-## Cómo correrlo
+## 📋 <a name="table">Tabla de contenido</a>
+
+1. ✨ [Introducción](#introduction)
+2. 📸 [Pantallas](#screens)
+3. ⚙️ [Stack](#tech-stack)
+4. 🔋 [Funciones](#features)
+5. 🗂️ [Estructura](#project-structure)
+6. 🤸 [Inicio rápido](#quick-start)
+7. 🧪 [Pruebas](#tests)
+8. 🚀 [Despliegue](#deployment)
+9. 🧩 [Los otros repos](#related)
+10. 📬 [Contacto](#contact)
+
+## <a name="introduction">✨ Introducción</a>
+
+La app de Cafeta es de teléfono y para estudiantes. Moderar una comunidad es otro trabajo: de pantalla ancha, con tablas y con permisos distintos. Por eso la administración vive en su propia aplicación.
+
+Solo entra quien tiene rol `ADMIN`, y esas cuentas no se registran por la web: nacen en la semilla o con un comando de la API. Cada pantalla lee y escribe en [cafeta-api](https://github.com/hjmnz-dev/cafeta-api), y las acciones de la consola quedan en la bitácora de auditoría.
+
+Nació como proyecto académico en INTEC y está desplegada en producción.
+
+## <a name="screens">📸 Pantallas</a>
+
+Capturas con los datos ficticios de la semilla de demo.
+
+<div align="center">
+  <img src="docs/readme/dashboard.webp" width="49%" alt="Dashboard con indicadores de la plataforma">
+  <img src="docs/readme/usuarios.webp" width="49%" alt="Listado de usuarios con estado y verificación">
+  <img src="docs/readme/reportes.webp" width="49%" alt="Revisión de reportes de la comunidad">
+  <img src="docs/readme/bitacora.webp" width="49%" alt="Bitácora de auditoría">
+</div>
+
+## <a name="tech-stack">⚙️ Stack</a>
+
+- **[React 18](https://react.dev)** y **[TypeScript](https://www.typescriptlang.org)** en modo strict.
+- **[Vite 6](https://vite.dev)** para el servidor de desarrollo y el build.
+- **[Tailwind CSS 4](https://tailwindcss.com)** y **[Lucide](https://lucide.dev)** para la interfaz.
+- **[React Router 7](https://reactrouter.com)** para las rutas.
+- **[TanStack Query 5](https://tanstack.com/query)** para los datos, con tipos generados desde el OpenAPI de la API.
+- **[Sentry](https://sentry.io)** para el monitoreo de errores.
+- **[Vitest](https://vitest.dev)** y **[Testing Library](https://testing-library.com)** para las pruebas; **oxlint** y **Prettier** para lint y formato.
+
+## <a name="features">🔋 Funciones</a>
+
+👉 **Dashboard**: Reportes pendientes, cuentas por verificar, usuarios activos, publicaciones e historias vigentes de un vistazo.
+
+👉 **Usuarios**: Búsqueda por nombre, usuario o correo, filtros por estado y verificación institucional.
+
+👉 **Desactivar y reactivar cuentas**: Con confirmación y una nota obligatoria. La baja es lógica: la cuenta conserva su registro.
+
+👉 **Reportes de la comunidad**: Revisa lo que denuncian los estudiantes y desestímalo, desactiva la publicación o desactiva la cuenta.
+
+👉 **Anuncios institucionales**: Redacta y publica avisos para la comunidad.
+
+👉 **Bitácora de auditoría**: Consulta quién hizo qué y cuándo, con filtros y solo de lectura.
+
+👉 **Informes**: Actividad y moderación por rango de fechas, con descarga en CSV.
+
+👉 **Acceso controlado**: Todas las secciones pasan por `RequireAdmin`, y la API vuelve a exigir el rol en cada ruta.
+
+👉 **Errores claros**: Un solo cliente HTTP traduce cada `code` de la API a un mensaje en español.
+
+## <a name="project-structure">🗂️ Estructura</a>
+
+```text
+deploy/
+└── server.mjs        Servidor estático de producción en App Service
+docs/readme/          Imágenes de este README
+public/               Iconos
+src/
+├── admin/
+│   ├── components/   Una pantalla por archivo y sus piezas
+│   ├── lib/          Lógica pura, cliente HTTP y tipos generados desde OpenAPI
+│   ├── store/        Sesión y hooks de TanStack Query por pantalla
+│   └── routes.tsx    Rutas, todas bajo RequireAdmin
+├── styles/           Tokens de marca y base de Tailwind
+└── test/             Configuración de las pruebas
+```
+
+## <a name="quick-start">🤸 Inicio rápido</a>
+
+Sigue estos pasos para correr la consola en tu máquina.
+
+**Requisitos**
+
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/en) 24, con npm
+- [cafeta-api](https://github.com/hjmnz-dev/cafeta-api) corriendo en el puerto 3000; su README explica cómo levantarla con datos de demo
+
+**Clonar el repositorio**
+
+```bash
+git clone https://github.com/hjmnz-dev/cafeta-admin-web.git
+cd cafeta-admin-web
+```
+
+**Instalación**
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm test           # 29 pruebas
-npm run typecheck  # TypeScript sin emitir
-npm run build      # bundle de producción en dist/
 ```
 
-## Estado del proyecto
+**Correr el proyecto**
 
-- **Sin backend.** Igual que la app móvil, los datos son de demostración y se persisten en `localStorage` (`cafeta.admin.v1`). Los setters de `AdminState` son exactamente lo que se sustituye por llamadas a la API cuando exista servidor.
-- **Sin autenticación real.** El selector de rol de la cabecera cambia entre administrador y estudiante para poder comprobar los permisos; en producción ese rol lo entrega el backend.
-- **Datos compartidos con la app móvil de forma manual.** Las denuncias que aquí se revisan son las que un estudiante levanta desde la app (HU55/HU56). Mientras no haya backend, cada aplicación tiene su propia copia de los datos de ejemplo.
+Usa el puerto 5174, que es el `ADMIN_ORIGIN` de la API:
 
-## Estructura
-
-```
-src/
-  admin/
-    App.tsx            Provider + router
-    routes.tsx         Rutas, todas bajo RequireAdmin
-    store/AdminState   Estado, acciones administrativas y bitácora
-    lib/metrics.ts     Indicadores del dashboard y armado de informes
-    lib/format.ts      Formatos de fecha y rangos
-    components/        Una pantalla por archivo
-  styles/index.css     Tokens de marca Cafeta y base de Tailwind
-  test/                setup de Vitest y utilidades de render
+```bash
+npm run dev -- --port 5174
 ```
 
-## Decisiones que conviene no perder
+Abre [http://localhost:5174](http://localhost:5174) en tu navegador y entra con el `SEED_ADMIN_EMAIL` y el `SEED_ADMIN_PASSWORD` de tu `.env` de la API.
 
-- **Toda acción pasa por `adminAction`**, que comprueba el permiso, aplica el cambio y escribe la bitácora en un solo lugar. Un camino que no pase por ahí sería una acción sin traza.
-- **Sancionar resuelve y restringe a la vez**: al sancionar un reporte se desactiva la cuenta o la publicación denunciada y se cierra el reporte, porque es una sola decisión.
-- **La baja es lógica, nunca borrado**: una cuenta desactivada conserva su registro, como pide HU48.
-- **Los gráficos son de una sola serie**, así que el color no codifica identidad: rojo de marca sobre blanco, texto en sus propios tonos, y la misma información disponible en tabla para lectura no visual.
+**Variables de entorno**
+
+No necesitas ninguna en local: sin `VITE_API_URL`, la consola usa `http://localhost:3000/api/v1`, y sin `VITE_SENTRY_DSN` no envía nada a Sentry. Están explicadas en [`.env.example`](.env.example).
+
+## <a name="tests">🧪 Pruebas</a>
+
+```bash
+npm test              # pruebas con Vitest y Testing Library
+npm run lint          # revisa todo el repo y falla con cualquier aviso
+npm run format:check  # revisa el formato
+npm run typecheck     # revisa los tipos
+npm run api:types     # regenera los tipos desde OpenAPI, con la API en el puerto 3000
+```
+
+Husky y lint-staged revisan lint, formato y tipos antes de cada commit, y el CI repite todo en cada push y en cada PR.
+
+## <a name="deployment">🚀 Despliegue</a>
+
+La consola corre en [cafeta-admin-hj01.azurewebsites.net](https://cafeta-admin-hj01.azurewebsites.net), en [Azure App Service](https://azure.microsoft.com/products/app-service) (Canada Central). Cada push a `main` corre el CI y, solo si todo pasa, el job `deploy`:
+
+1. Compila con la URL de la API y el DSN de Sentry del ambiente `production`.
+2. Sube los source maps a Sentry y comprueba que ninguno quede publicado.
+3. Entra a Azure con OIDC, sin contraseñas guardadas en GitHub, y sube `dist/` con `deploy/server.mjs`.
+4. Espera a que `/version.txt` muestre el commit nuevo.
+
+Las demás ramas y los PR nunca despliegan.
+
+## <a name="related">🧩 Los otros repos</a>
+
+Cafeta son tres repositorios que se despliegan por separado:
+
+- **[cafeta-api](https://github.com/hjmnz-dev/cafeta-api)**: la API.
+- **[cafeta-app](https://github.com/hjmnz-dev/cafeta-app)**: la app web del estudiante.
+- **[cafeta-admin-web](https://github.com/hjmnz-dev/cafeta-admin-web)**: esta consola.
+
+## <a name="contact">📬 Contacto</a>
+
+**Hamsell Jiménez**
+
+- [GitHub](https://github.com/hjmnz-dev)
+- [LinkedIn](https://www.linkedin.com/in/hamselljimenez)
+- [hamselljimenez@gmail.com](mailto:hamselljimenez@gmail.com)
